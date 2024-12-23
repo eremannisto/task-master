@@ -1,0 +1,78 @@
+/* src/components/TaskManager/TaskManager.css */
+h1 {
+  font-size: var(--fs-fluid-xxl);
+  text-align: center;
+  line-height: 1;
+  color: var(--color-zinc-500);
+  font-weight: 700;
+  padding-top: 7.5dvh;
+  padding-bottom: 5dvh;
+}
+
+h1 span {
+  color: var(--color-zinc-200);
+}
+
+.projects-container {
+  width: 100%;
+  max-width: 1600px;
+  margin: 0 auto;
+  margin-top: 2rem;
+}
+
+.projects-grid {
+  position: relative;
+  width: 100%;
+  margin: 0 auto;
+}
+
+.project-container {
+  outline: none;
+  order: attr(data-index);
+  position: relative;
+  z-index: 1;
+}
+
+.project-container:focus-visible {
+  outline: 2px solid var(--focus-ring-color, #4299e1);
+  outline-offset: 2px;
+  border-radius: 8px;
+  transform: translateY(-2px);
+  z-index: 2;
+}
+
+.project-skeleton {
+  background: var(--card-bg, #1a1a1a);
+  border: 1px solid var(--border-color, #333);
+  border-radius: 8px;
+  padding: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  width: 300px;
+  margin-bottom: 16px;
+}
+
+.no-results {
+  text-align: center;
+  color: var(--text-secondary);
+  padding: 32px;
+  font-size: 1.125rem;
+}
+
+/* Only animate on initial load */
+.projects-container[data-loading="false"] .project-container {
+  animation: fadeIn 0.3s ease-out;
+  animation-fill-mode: backwards;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}

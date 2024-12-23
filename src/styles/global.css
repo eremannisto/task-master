@@ -1,0 +1,111 @@
+:root {
+
+  /* Fonts */
+  --fs-base   : 62.5%;
+  --fm-sans   : 'Inter', sans-serif;
+  --fm-display: 'Inter-Display', sans-serif;
+  --fm-mono   : ui-monospace, monospace;
+
+  /* Fluid font sizes */
+  --fs-fluid-sm   : clamp(1.28rem,  0.17vi  + 1.21rem,  1.43rem);
+  --fs-fluid-base : clamp(1.6rem,   0.34vi  + 1.46rem,  1.9rem);
+  --fs-fluid-md   : clamp(2rem,     0.61vi  + 1.76rem,  2.53rem);
+  --fs-fluid-lg   : clamp(2.5rem,   1vi     + 2.1rem,   3.38rem);
+  --fs-fluid-xl   : clamp(3.13rem,  1.56vi  + 2.5rem,   4.5rem);
+  --fs-fluid-xxl  : clamp(3.91rem,  2.38vi  + 2.96rem,  6rem);
+  --fs-fluid-xxxl : clamp(4.88rem,  3.54vi  + 3.47rem,  8rem);
+
+  /* Miscellaneous */
+  --max-width        : 120rem;
+  --navigation-height: 8rem;
+
+  /* Spacing */
+  --space-50: 0.4rem;
+  --space-100: 0.8rem;
+  --space-200: 1.6rem;
+  --space-300: 2.4rem;
+  --space-400: 3.2rem;
+  --space-500: 4.0rem;
+
+  /* Colors */
+  --color-focus         : var(--color-blue-300);
+  --color-highlight     : var(--color-zinc-500);
+  --color-highlight-text: var(--color-zinc-50);
+}
+
+/* If browser supports variable fonts, use them */
+@supports (font-variation-settings: normal) {
+  :root { 
+    --ff-sans: "Inter-Variable", sans-serif;
+  }
+
+  data {
+    font-feature-settings   : "cv01", "cv03", "cv04", "cv09", "tnum";
+  }
+}
+
+/* Large displays (11/16) */
+@media (min-width: 1024px) {
+  html {
+    font-size: 68.75%;
+  }
+}
+
+/* Small displays (10/16) */
+@media (min-width: 768px) {
+  html {
+    font-size: 62.5%;
+  }
+}
+
+/* Extra small displays (9/16) */
+@media (min-width: 480px) {
+  html {
+    font-size: 56.25%;
+  }
+}
+
+/* Mobile displays (8/16) */
+@media (max-width: 480px) {
+  html {
+    font-size: 50%;
+  }
+}
+
+body {
+  background : var(--color-zinc-950);
+  color      : var(--color-zinc-50);
+  font-family: var(--fm-sans);
+  font-size  : var(--fs-base);
+  margin     : var(--space-300);
+  margin-top : calc(var(--navigation-height) + var(--space-300));
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--fm-display);
+}
+
+main {
+  display         : flex;
+  flex-direction  : column;
+  min-height      : 100vh;
+  max-width       : var(--max-width);
+  margin          : 0 auto;
+  align-items     : center;
+}
+
+/* Cursor Highlight */
+::-moz-selection {
+  background: var(--color-highlight);
+  color     : var(--color-highlight-text);
+}
+::selection {
+  background: var(--color-highlight);
+  color     : var(--color-highlight-text);
+}
+
+/* Focus ring */
+:focus-visible, button:focus-visible {
+  outline: 2px solid var(--color-focus) !important;
+  outline-offset: 2px !important;
+}

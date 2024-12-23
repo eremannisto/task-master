@@ -1,0 +1,18 @@
+.skeleton {
+  --skeleton-color-start: color-mix(in srgb, var(--color-500), var(--color-white) 20%);
+  --skeleton-color-end  : color-mix(in srgb, var(--color-500), var(--color-white) 50%);
+
+  background: linear-gradient(
+      90deg,
+      var(--skeleton-color-start) 25%,
+      var(--skeleton-color-end)   37%,
+      var(--skeleton-color-start) 63%
+  );
+  background-size: 400% 100%;
+  animation: skeleton-loading 1.4s ease infinite;
+}
+
+@keyframes skeleton-loading {
+  0%   { background-position: 100% 50%; }
+  100% { background-position: 0    50%; }
+}

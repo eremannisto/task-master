@@ -1,0 +1,386 @@
+/* src/components/Project/Project.css */
+.project {
+  background: var(--color-zinc-900);
+  border: 1px solid var(--color-zinc-800);
+  border-radius: 8px;
+  padding: 1.6rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.2rem;
+  padding-top: 2.8rem;
+  transition: height 0.2s ease-out;
+  height: auto;
+  min-height: 100px;
+
+  & > header {
+
+    .details {
+      display: flex;
+      flex-direction: column;
+      gap: 0.2rem;
+
+      .title {
+        font-size: 1.6rem;
+        font-weight: 500;
+        color: var(--color-zinc-100);
+        line-height: 1.2;
+        flex-grow: 1;
+      }
+
+      .description {
+        font-size: 1.6rem;
+        font-weight: 400;
+        color: var(--color-zinc-400);
+        line-height: 1.2;
+      }
+    }
+  }
+}
+
+
+
+/* List of tasks */
+.tasks {
+  display       : flex;
+  flex-direction: column;
+  gap           : 0.2rem;
+  padding       : 0;
+  margin        : 0;
+  list-style    : none;
+  transition: all 0.2s ease-out;
+
+  /* List element */
+  .task{
+    display        : flex;
+    flex-direction : row;
+    gap            : 0.2rem;
+    border-radius  : 4px;
+    transition: all 0.2s ease-out;
+
+    --task-background           : transparent;
+    --task-background-hover     : color-mix(in srgb, var(--color-zinc-400), transparent 90%);
+    --status-color             : var(--color-zinc-400);
+    --status-color-hover       : var(--color-zinc-200);
+    --input-color             : var(--color-zinc-500);
+    --input-color-hover       : var(--color-zinc-200);
+    --input-color-focus       : var(--color-zinc-50);
+    --delete-button           : var(--color-zinc-500);
+    --delete-button-hover     : var(--color-red-400);
+
+    /* &[data-status="todo"] {} */
+
+    &[data-status="doing"] {
+      --task-background-hover     : color-mix(in srgb, var(--color-violet-400), transparent 90%);
+      --status-color             : var(--color-violet-400);
+      --status-color-hover       : var(--color-violet-500);
+      --input-color             : var(--color-violet-400);
+      --input-color-hover       : var(--color-violet-100);
+      --input-color-focus       : var(--color-violet-100);
+    }
+
+    &[data-status="done"] {
+      --task-background-hover     : color-mix(in srgb, var(--color-emerald-400), transparent 90%);
+      --status-color             : var(--color-emerald-400);
+      --status-color-hover       : var(--color-emerald-500);
+      --input-color             : var(--color-emerald-400);
+      --input-color-hover       : var(--color-emerald-100);
+      --input-color-focus       : var(--color-emerald-100);
+
+      textarea {
+        /* text-decoration: line-through; */
+        color: var(--input-color);
+      }
+
+      &:hover textarea {
+        text-decoration: none;
+        color: var(--input-color-hover);
+      }
+
+      &:has(textarea:focus-visible) textarea {
+        text-decoration: none;
+        color: var(--input-color-focus);
+      }
+    }
+
+    [data-action="delete"] {
+      visibility: hidden;
+    }
+
+    &:hover {
+      background-color: var(--task-background-hover);
+      color           : var(--input-color-hover);
+
+      [data-action="delete"] {
+        visibility: visible;
+      }
+
+      [data-action="status"] svg {
+        color: var(--status-color-hover);
+      }
+    }
+
+    &:has(button[data-action="delete"]:hover) {
+      --task-background-hover: color-mix(in srgb, var(--color-red-500), transparent 90%);
+      --input-color          : var(--color-red-400);
+      --status-color         : var(--color-red-400);
+      --status-color-hover   : var(--color-red-400);
+
+      [data-icon="delete"] {
+        display: block;
+      }
+      [data-icon="status"] {
+        display: none;
+      }
+    }
+
+    svg:first-child {
+      color: var(--status-color);
+    }
+
+
+    /* Textarea (Normal, Hover, Focus) */
+    textarea {
+      color: var(--input-color);
+      border-radius: 4px;
+
+      &:hover {
+        color: var(--input-color-hover);
+      }
+
+      &:focus-visible {
+        color: var(--input-color-focus);
+      }
+    }
+
+    button {
+      background-color  : transparent;
+      aspect-ratio      : 1/1;
+      height            : min-content;
+
+      &[data-action="status"] {
+
+        [data-icon="delete"] {
+          display: none;
+        }
+        
+        [data-icon="status"] {
+          display: block;
+        }
+      }
+
+      &[data-action="delete"] {
+        svg {
+          color: var(--delete-button);
+        }
+        &:hover svg {
+          color: var(--delete-button-hover);
+        }
+      }
+    }
+
+    button:hover {
+      .description {
+        color: var(--input-color);
+      }
+    }
+
+    textarea.description,
+    span.description {
+      flex-grow: 1;
+      border: none;
+      background: transparent;
+      font-family: inherit;
+      color: var(--input-color);
+      font-weight: 500;
+      font-size: 1.6rem;
+      line-height: 1.2;
+      padding: 0;
+      margin: 0;
+      resize: none;
+      overflow: hidden;
+      padding: 0.8rem 0;
+      outline: transparent;
+      transition: height 0.2s ease-out;
+    }
+
+    button,
+    .fake-button{
+      display: flex;
+      align-items: flex-start;
+      gap: 0.8rem;
+      text-align: left;
+      background: none;
+      border: none;
+      padding: 0.8rem 0.8rem;
+      cursor: pointer;
+      border-radius: 4px;
+      transition: background-color 0.2s;
+      color: inherit;
+      
+      &:focus-visible {
+        outline: 2px solid var(--focus-ring-color, #4299e1);
+        outline-offset: 2px;
+      }
+  
+      .description {
+        font-size: 1.6rem;
+        font-weight: 400;
+        line-height: 1.2;
+      }
+  
+      .icon, svg {
+        width: 1.8rem;
+        height: 1.8rem;
+        flex-shrink: 0;
+      }
+  
+    }
+  }
+}
+
+.project > .actions {
+  display: flex;
+  flex-direction: row;
+  gap: 0.4rem;
+  justify-content: flex-end;
+  
+  .action {
+    background: color-mix(in srgb, var(--color-zinc-400), transparent 90%);
+    border: none;
+    padding: 0.6rem 1.2rem;
+    cursor: pointer;
+    color: var(--color-zinc-400);
+    border-radius: 4px;
+    transition: opacity 0.2s;
+    flex-grow: 1;
+    display: flex;
+    align-items: center;
+    gap: 0.8rem;
+    font-size: 1.4rem;
+    justify-content: center;
+    width: 100%;
+
+    transition: all 0.2s ease;
+
+
+    &[data-action="edit"] {
+      background: color-mix(in srgb, var(--color-zinc-400), transparent 90%);
+      color: var(--color-zinc-50);
+
+      &:hover {
+        background: color-mix(in srgb, var(--color-zinc-400), transparent 85%);
+        color: var(--color-zinc-200);
+      }
+    }
+
+    &[data-action="delete"] {
+      background: color-mix(in srgb, var(--color-red-700), transparent 20%);
+      color: var(--color-red-50);
+
+      &:hover {
+        background: color-mix(in srgb, var(--color-red-700), transparent 10%);
+        color: var(--color-red-50);
+      }
+    }
+
+    svg {
+      width: 1.8rem;
+      height: 1.8rem;
+      flex-shrink: 0;
+    }
+  }
+}
+
+.hidden-tasks {
+  opacity: 0.5;
+  &:hover {
+    background: transparent !important;
+  }
+  .fake-button {
+    cursor: default;
+    pointer-events: none;
+  }
+}
+
+.actions {
+  display: flex;
+  flex-direction: row;
+  gap: 0.4rem;
+  justify-content: center;
+  align-items: center;
+  
+  .edit, .delete {
+    flex-grow: 1;
+    border-radius: 4px;
+    border: none;
+    background: transparent;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    padding: 0.8rem 1.2rem;
+    font-size: 1.6rem;
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+    gap: 0.8rem;
+    justify-content: center;
+    width: 100%;
+  }
+
+  .edit {
+    background: color-mix(in srgb, var(--color-zinc-400), transparent 90%);
+    color: var(--color-zinc-50);
+
+    &:hover {
+      background: color-mix(in srgb, var(--color-zinc-400), transparent 85%);
+      color: var(--color-zinc-200);
+
+      svg {
+        color: var(--color-zinc-200);
+      }
+    }
+  }
+
+  .delete {
+    background: color-mix(in srgb, var(--color-zinc-400), transparent 90%);
+    color: var(--color-red-50);
+
+    &:hover {
+      background: color-mix(in srgb, var(--color-red-700), transparent 25%);
+      color: var(--color-red-50);
+    }
+  }
+
+  svg {
+    width: 1.6rem;
+    height: 1.6rem;
+    flex-shrink: 0;
+  }
+}
+
+.confirmDelete {
+  display: flex;
+  flex-direction: column;
+  gap: 1.6rem;
+  padding: 1.6rem;
+}
+
+.warning {
+  color: var(--color-red-400);
+  font-size: 1.4rem;
+}
+
+.confirmActions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.8rem;
+  margin-top: 0.8rem;
+}
+
+[data-action="danger"] {
+  background: var(--color-red-700);
+  color: var(--color-red-50);
+}
+
+[data-action="danger"]:hover {
+  background: var(--color-red-800);
+}

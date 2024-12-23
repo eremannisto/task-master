@@ -1,0 +1,84 @@
+.filter {
+  --filter-background                : var(--color-zinc-900);
+  --filter-background-hover          : var(--color-zinc-800);
+  --filter-background-selected       : var(--color-zinc-800);
+  --filter-background-selected-hover : var(--color-zinc-700);
+  --filter-border                    : var(--color-zinc-800);
+  --filter-border-selected           : var(--color-zinc-500);
+  --filter-text                      : var(--color-zinc-500);
+  --filter-text-selected             : var(--color-zinc-50);
+  --filter-icon                      : var(--color-zinc-500);
+
+  display: flex;
+  gap: 0.4rem;
+  padding: 0.6rem;
+  background: var(--filter-background);
+  border: 1px solid var(--filter-border);
+  border-radius: 8px;
+  width: fit-content;
+  z-index: 1;
+}
+
+.filter button {
+  background: none;
+  border: none;
+  padding: 0.6rem 1.2rem;
+  border-radius: 6px;
+  color: var(--filter-text);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-size: 1.6rem;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+
+  &[data-status="todo"][aria-selected="true"] {
+    --filter-background-selected       : color-mix(in srgb, var(--color-zinc-400), transparent 90%);
+    --filter-background-selected-hover : color-mix(in srgb, var(--color-zinc-400), transparent 85%);
+    --filter-text-selected            : var(--color-zinc-50);
+    --filter-icon-selected            : var(--color-zinc-50);
+  }
+
+  &[data-status="doing"][aria-selected="true"] {
+    --filter-background-selected       : color-mix(in srgb, var(--color-violet-400), transparent 90%);
+    --filter-background-selected-hover : color-mix(in srgb, var(--color-violet-400), transparent 85%);
+    --filter-text-selected            : var(--color-violet-400);
+    --filter-icon-selected            : var(--color-violet-400);
+  }
+
+  &[data-status="done"][aria-selected="true"] {
+    --filter-background-selected       : color-mix(in srgb, var(--color-emerald-400), transparent 90%);
+    --filter-background-selected-hover : color-mix(in srgb, var(--color-emerald-400), transparent 85%);
+    --filter-text-selected            : var(--color-emerald-200);
+    --filter-icon-selected            : var(--color-emerald-200);
+  }
+
+  svg {
+    width: 1.6rem;
+    height: 1.6rem;
+    color: var(--filter-icon);
+  }
+
+  &[aria-selected="true"] {
+    background: var(--filter-background-selected);
+    color: var(--filter-text-selected);
+
+    svg {
+      color: var(--filter-icon-selected);
+    }
+
+    &:hover {
+      background: var(--filter-background-selected-hover);
+    }
+  }
+
+  &:hover:not([aria-selected="true"]) {
+    background: var(--filter-background-hover);
+  }
+
+  &:focus-visible {
+    outline: 2px solid var(--focus-ring-color);
+    outline-offset: 2px;
+  }
+}

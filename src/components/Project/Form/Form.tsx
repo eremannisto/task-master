@@ -72,7 +72,9 @@ export const Form = ({
   }, [project]);
 
   const generateId = () => {
-    return crypto.randomUUID();
+    return 'id-' + Math.random().toString(36).substring(2, 9) + '-' + 
+           Date.now().toString(36) + '-' + 
+           Math.random().toString(36).substring(2, 9);
   };
 
   const validateId = (value: string) => {

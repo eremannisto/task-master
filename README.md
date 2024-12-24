@@ -1,4 +1,4 @@
-<img src="https://raw.githubusercontent.com/eremannisto/task-master/refs/heads/main/public/banner.png" alt="Task Master" />
+<img src="https://taskmaster.eremannisto.com/banner.png" alt="Task Master" />
 
 # Task Master
 A straightforward task management application built with React. Create and organize task lists while maintaining a strong focus on accessibility. Designed to work offline and meet WCAG 2.2 AA standards.

@@ -27,11 +27,14 @@ export default function Filter({ value, onChange }: FilterProps) {
   const filters: FilterValue[] = ['all', 'todo', 'doing', 'done'];
   const buttonsRef = useRef<(HTMLButtonElement | null)[]>([]);
   
-  // Focus management
+  // Focus management - only for arrow key navigation
   useEffect(() => {
+    // Only update focus when value changes due to arrow key navigation
     const selectedIndex = filters.indexOf(value);
-    buttonsRef.current[selectedIndex]?.focus();
-  }, [value]);
+    if (document.activeElement?.getAttribute('role') === 'tab') {
+      buttonsRef.current[selectedIndex]?.focus();
+    }
+  }, [value, filters]);
 
   // Keyboard interaction handler
   const handleKeyDown = (e: React.KeyboardEvent, index: number) => {

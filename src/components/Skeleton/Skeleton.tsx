@@ -9,9 +9,9 @@ export const Skeleton = ({
   className = ''
 }: SkeletonComponent) => {
   const style: CSSProperties = {
-    width        : typeof width  === 'number' ? `${width}rem`  : width,
-    height       : typeof height === 'number' ? `${height}rem` : height,
-    borderRadius : typeof radius === 'number' ? `${radius}rem` : radius
+    width        : typeof width  === 'number' ? `${width}px`  : width,
+    height       : typeof height === 'number' ? `${height}px` : height,
+    borderRadius : typeof radius === 'number' ? `${radius}px` : radius
   };
   return (
     <div 

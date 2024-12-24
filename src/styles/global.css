@@ -109,3 +109,9 @@ main {
   outline: 2px solid var(--color-focus) !important;
   outline-offset: 2px !important;
 }
+
+/* Disabled elements */
+:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}

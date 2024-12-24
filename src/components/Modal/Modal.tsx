@@ -13,13 +13,21 @@ export const Modal = ({ title, isOpen, onClose, children }: ModalProps) => {
   const modalRef = useRef<HTMLDialogElement>(null);
 
   useEffect(() => {
+    const handleOverflow = () => {
+      document.body.style.overflow = isOpen ? 'hidden' : '';
+    };
+
     if (isOpen) {
       modalRef.current?.showModal();
-      document.body.style.overflow = 'hidden';
+      handleOverflow();
     } else {
       modalRef.current?.close();
-      document.body.style.overflow = 'unset';
+      handleOverflow();
     }
+
+    return () => {
+      document.body.style.overflow = '';
+    };
   }, [isOpen]);
 
   return (

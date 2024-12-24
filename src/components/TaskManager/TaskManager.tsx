@@ -1,51 +1,67 @@
 import type { ProjectComponent, TaskComponent, TaskStatus } from '@types';
 import { useState, useEffect, useCallback, useMemo, useRef } from 'react';
 import { Masonry }  from 'masonic';
-import { Project }  from '@components/Project/Project';
-import { Skeleton } from '@components/Skeleton/Skeleton';
-import Filter       from '@components/Filter/Filter';
-import { Modal }    from '@components/Modal/Modal';
 import { Form as ProjectForm } from '@components/Project/Form/Form';
+import { Project }  from '@components/Project/Project';
+import { Modal }    from '@components/Modal/Modal';
+import Filter       from '@components/Filter/Filter';
 import Navigation from '@components/Navigation/Navigation';
+import { ProjectSkeleton } from '@components/Project/Project.skeleton';
+import { Plus } from 'lucide-react';
 import './TaskManager.css';
 
 // Generate stable keys for Masonry grid items to prevent unnecessary re-renders
-const getStableKey = (project: ProjectComponent) => `project-${project.id}`;
+const getStableKey = (project: ProjectComponent | { id: string }) => `project-${project.id}`;
 
 // Interface for storing position information
 interface ItemPosition {
-  id: string;
-  x: number;
-  y: number;
-  width: number;
+  id    : string;
+  x     : number;
+  y     : number;
+  width : number;
   height: number;
 }
 
+// Generate skeleton items for Masonry grid
+const generateSkeletonItems = (count: number) => Array.from({ length: count }, (_, i) => ({
+  id: `skeleton-${i}`
+}));
+
+// Main TaskManager component
 export default function TaskManager() {
   const [projects,       setProjects]       = useState<ProjectComponent[]>([]);
   const [isLoading,      setIsLoading]      = useState(true);
   const [filter,         setFilter]         = useState<'all' | TaskStatus>('all');  
   const [editingProject, setEditingProject] = useState<ProjectComponent | null>(null);
   const [isModalOpen,    setIsModalOpen]    = useState(false);
-  const projectRefs = useRef<Map<string, HTMLDivElement>>(new Map());
+
+  const projectRefs   = useRef<Map<string, HTMLDivElement>>(new Map());
   const itemPositions = useRef<Map<string, ItemPosition>>(new Map());
-  const containerRef = useRef<HTMLElement>(null);
+  const containerRef  = useRef<HTMLElement>(null);
 
   // Load projects from localStorage on initial mount
   useEffect(() => {
-    try {
-      const storedProjects = localStorage.getItem('projects');
-      if (storedProjects && storedProjects !== 'undefined') {
-        const parsedProjects = JSON.parse(storedProjects);
-        if (Array.isArray(parsedProjects)) {
-          setProjects(parsedProjects);
+    const loadProjects = async () => {
+      try {
+        // Add a fake loading time
+        const emulatedLoadingTime = 1000;
+        await new Promise(resolve => setTimeout(resolve, emulatedLoadingTime));
+        
+        const storedProjects = localStorage.getItem('projects');
+        if (storedProjects && storedProjects !== 'undefined') {
+          const parsedProjects = JSON.parse(storedProjects);
+          if (Array.isArray(parsedProjects)) {
+            setProjects(parsedProjects);
+          }
         }
+      } catch (error) {
+        console.error('Error loading projects:', error);
+      } finally {
+        setIsLoading(false);
       }
-    } catch (error) {
-      console.error('Error loading projects:', error);
-    } finally {
-      setIsLoading(false);
-    }
+    };
+
+    loadProjects();
   }, []);
 
   // Persist projects to localStorage whenever they change
@@ -63,60 +79,6 @@ export default function TaskManager() {
       project.tasks.some(task => task.status === filter)
     );
   }, [projects, filter]);
-
-  // Project operations
-  const handleDelete = useCallback((projectId: string) => {
-    setProjects(prev => prev.filter(p => p.id !== projectId));
-  }, []);
-
-  const handleTaskUpdate = useCallback((projectId: string, newTasks: TaskComponent[]) => {
-    // Only update if tasks actually changed
-    setProjects(prev => {
-      const project = prev.find(p => p.id === projectId);
-      if (!project || JSON.stringify(project.tasks) === JSON.stringify(newTasks)) {
-        return prev; // No change needed
-      }
-      return prev.map(p => 
-        p.id === projectId 
-          ? { ...p, tasks: newTasks }
-          : p
-      );
-    });
-  }, []);
-
-  const handleCreateProject = (projectData: Omit<ProjectComponent, 'id' | 'tasks'>) => {
-    const newProject: ProjectComponent = {
-      id: crypto.randomUUID(),
-      ...projectData,
-      tasks: []
-    };
-    
-    setProjects(prev => [...prev, newProject]);
-    setIsModalOpen(false);
-  };
-
-  const handleEditProject = (projectData: Omit<ProjectComponent, 'id' | 'tasks'>) => {
-    if (!editingProject) return;
-    
-    setProjects(prev => prev.map(project => 
-      project.id === editingProject.id 
-        ? { ...project, ...projectData }
-        : project
-    ));
-    
-    setEditingProject(null);
-    setIsModalOpen(false);
-  };
-
-  // Set initial focus on first project when filter changes
-  useEffect(() => {
-    if (!isLoading && filteredProjects.length > 0) {
-      const firstProject = filteredProjects[0];
-      setTimeout(() => {
-        projectRefs.current.get(firstProject.id)?.focus();
-      }, 100); // Small delay to ensure DOM is ready
-    }
-  }, [filter, isLoading, filteredProjects]);
 
   // Update positions when Masonic renders
   const handleMasonryRender = useCallback(() => {
@@ -142,6 +104,64 @@ export default function TaskManager() {
       });
     });
   }, [filteredProjects]);
+
+  // Project operations
+  const handleDelete = useCallback((projectId: string) => {
+    // Clean up refs
+    projectRefs.current.delete(projectId);
+    itemPositions.current.delete(projectId);
+    
+    setProjects(prev => {
+      const newProjects = prev.filter(p => p.id !== projectId);
+      // Schedule a position update after the state change is complete
+      requestAnimationFrame(() => {
+        handleMasonryRender();
+      });
+      return newProjects;
+    });
+  }, [handleMasonryRender]);
+
+  const handleTaskUpdate = useCallback((projectId: string, newTasks: TaskComponent[]) => {
+    // Only update if tasks actually changed
+    setProjects(prev => {
+      const project = prev.find(p => p.id === projectId);
+      if (!project || JSON.stringify(project.tasks) === JSON.stringify(newTasks)) {
+        return prev; // No change needed
+      }
+      return prev.map(p => 
+        p.id === projectId 
+          ? { ...p, tasks: newTasks }
+          : p
+      );
+    });
+  }, []);
+
+  const handleCreateProject = (projectData: Omit<ProjectComponent, 'tasks'>) => {
+    const newProject: ProjectComponent = {
+      ...projectData,
+      tasks: []
+    };
+    
+    setProjects(prev => [...prev, newProject]);
+    setIsModalOpen(false);
+  };
+
+  const handleEditProject = (projectData: Omit<ProjectComponent, 'id' | 'tasks'>) => {
+    if (!editingProject) return;
+    
+    setProjects(prev => prev.map(project => 
+      project.id === editingProject.id 
+        ? { 
+            ...project,
+            name: projectData.name,
+            description: projectData.description
+          }
+        : project
+    ));
+    
+    setEditingProject(null);
+    setIsModalOpen(false);
+  };
 
   // Find closest item in given direction
   const findClosestItem = useCallback((currentId: string, direction: 'up' | 'down' | 'left' | 'right'): string | null => {
@@ -242,16 +262,15 @@ export default function TaskManager() {
   }, [handleMasonryRender]);
 
   // Render individual project for Masonry grid
-  const renderProject = useCallback(({ data: project, index }: { data: ProjectComponent, index: number }) => (
+  const renderProject = useCallback(({ data: project}: { data: ProjectComponent, index: number }) => (
     <div 
       ref={el => el && projectRefs.current.set(project.id, el)}
       key={getStableKey(project)}
       id={getStableKey(project)}
-      role="gridcell"
       className="project-container"
       tabIndex={0}
-      aria-rowindex={Math.floor(index / 4) + 1}
-      aria-colindex={(index % 4) + 1}
+      role="listitem"
+      aria-label={`Project: ${project.name}`}
       onKeyDown={(e) => handleProjectKeyDown(e, project.id)}
     >
       <Project
@@ -267,17 +286,6 @@ export default function TaskManager() {
     </div>
   ), [handleDelete, handleTaskUpdate, filter, handleProjectKeyDown]);
 
-  // Clean up refs when projects change
-  useEffect(() => {
-    const currentRefs = new Map(projectRefs.current);
-    projectRefs.current = new Map();
-    itemPositions.current.clear();
-    
-    return () => {
-      currentRefs.clear();
-    };
-  }, [filteredProjects]);
-
   return (
     <>
       <Navigation onNewProject={() => setIsModalOpen(true)} />
@@ -290,47 +298,55 @@ export default function TaskManager() {
 
       <Filter value={filter} onChange={setFilter} />
 
-      {/* Projects Grid with Loading and Empty States */}
       <section 
         ref={containerRef}
         className="projects-container" 
         id="filtered-projects"
-        role="grid"
-        aria-label="Projects grid"
-        aria-rowcount={Math.ceil(filteredProjects.length / 4)}
-        aria-colcount={Math.min(4, filteredProjects.length)}
-        aria-live="polite"
+        role="list"
+        aria-label="Projects list"
       >
         {isLoading ? (
-          <div className="projects-grid">
-            {Array.from({ length: 6 }).map((_, i) => (
-              <div key={i} className="project-skeleton">
-                <Skeleton height={32} className="skeleton-header" />
-                <Skeleton height={24} width="60%" />
-                <Skeleton height={24} width="80%" />
-                <Skeleton height={24} width="70%" />
-              </div>
-            ))}
-          </div>
+          <Masonry
+            items={generateSkeletonItems(10)}
+            columnGutter={8}
+            columnWidth={300}
+            render={() => <ProjectSkeleton/>}
+            overscanBy={2}
+            maxColumnCount={4}
+            rowGutter={8}
+          />
         ) : filteredProjects.length > 0 ? (
           <Masonry
+            key={filteredProjects.map(p => p.id).join(',')}
             items={filteredProjects}
             columnGutter={8}
             columnWidth={300}
             render={renderProject}
             overscanBy={2}
-            role="grid"
             maxColumnCount={4}
             itemHeightEstimate={200}
-            key={`masonry-${filter}`}
             rowGutter={8}
-            itemKey={getStableKey}
             onRender={handleMasonryRender}
           />
         ) : (
-          <p className="no-results">
-            No projects found with {filter} tasks
-          </p>
+          <div className="no-results">
+            <p>
+              {filter === 'all' 
+                ? "No projects found. Create your first project!"
+                : `No projects found with filter: ${filter}`
+              }
+            </p>
+            {filter === 'all' && (
+              <button 
+                className="create-project-button"
+                onClick={() => setIsModalOpen(true)}
+                aria-label="Create new project"
+              >
+                <Plus aria-hidden="true" />
+                <span>New Project</span>
+              </button>
+            )}
+          </div>
         )}
       </section>
 
@@ -350,6 +366,21 @@ export default function TaskManager() {
           onCancel={() => {
             setIsModalOpen(false);
             setEditingProject(null);
+          }}
+          // Original task requires *name* to be unique and only allow 
+          // letters and numbers. But current application uses id as identifier
+          // and allows letters, numbers and dashes. If no id is provided,
+          // it will generate a random one.
+
+          idValidation={{
+            allowLetters: true,
+            allowNumbers: true,
+            allowDashes : true,
+            allowSpaces : false,
+            allowDots   : false,
+            allowUnderscores: false,
+            minLength: 3,
+            maxLength: 60
           }}
         />
       </Modal>

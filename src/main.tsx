@@ -12,7 +12,7 @@ import Background  from '@components/Background/Background.tsx'
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
-    <Navigation />
+    <Navigation onNewProject={() => {}} />
     <main>
       <TaskManager />
     </main>

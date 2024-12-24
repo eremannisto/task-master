@@ -77,3 +77,35 @@
     }
   }
 }
+
+.error {
+  color: var(--color-red-400);
+  font-size: 1.4rem;
+}
+
+.field input[aria-invalid="true"] {
+  border-color: var(--color-red-400);
+  background: color-mix(in srgb, var(--color-red-400), transparent 90%);
+}
+
+.field input[disabled] {
+  cursor: not-allowed;
+  pointer-events: none;
+}
+
+.idField {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.help {
+  color: var(--color-zinc-400);
+  font-size: 1.4rem;
+}
+
+.field input[disabled]:not([disabled="false"]) {
+  background: var(--color-zinc-900);
+  color: var(--color-zinc-500);
+  cursor: not-allowed;
+} 

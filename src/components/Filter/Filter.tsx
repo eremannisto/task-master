@@ -1,13 +1,12 @@
-// src/components/Filter/Filter.tsx
 import { useRef, useEffect }                    from 'react';
 import { type TaskStatus, FilterValue }         from '@types';
 import { CircleDashed, CircleDot, CircleCheck } from 'lucide-react';
-import './Filter.css';
+import styles                                   from './Filter.module.css';
 
 const icons: Record<TaskStatus, React.ReactNode> = {
-  todo:  <CircleDashed className="task-icon" aria-hidden="true" />,
-  doing: <CircleDot    className="task-icon" aria-hidden="true" />,
-  done:  <CircleCheck  className="task-icon" aria-hidden="true" />,
+  todo : <CircleDashed className={styles.icon} aria-hidden="true" />,
+  doing: <CircleDot    className={styles.icon} aria-hidden="true" />,
+  done : <CircleCheck  className={styles.icon} aria-hidden="true" />,
 };
 
 // Descriptive text for screen readers
@@ -25,44 +24,46 @@ interface FilterProps {
 
 export default function Filter({ value, onChange }: FilterProps) {
   const filters: FilterValue[] = ['all', 'todo', 'doing', 'done'];
-  const buttonsRef = useRef<(HTMLButtonElement | null)[]>([]);
+  const buttonsRef           = useRef<(HTMLButtonElement | null)[]>([]);
+  const isKeyboardNavigation = useRef(false);
   
-  // Focus management - only for arrow key navigation
+  // Focus management - only for keyboard navigation
   useEffect(() => {
-    // Only update focus when value changes due to arrow key navigation
-    const selectedIndex = filters.indexOf(value);
-    if (document.activeElement?.getAttribute('role') === 'tab') {
+    if (isKeyboardNavigation.current) {
+      const selectedIndex = filters.indexOf(value);
       buttonsRef.current[selectedIndex]?.focus();
+      isKeyboardNavigation.current = false;
     }
   }, [value, filters]);
 
   // Keyboard interaction handler
   const handleKeyDown = (e: React.KeyboardEvent, index: number) => {
     let nextIndex: number;
+    isKeyboardNavigation.current = true;
 
     switch (e.key) {
       case 'ArrowLeft':
       case 'ArrowUp':
         e.preventDefault();
         nextIndex = index === 0 ? filters.length - 1 : index - 1;
-        onChange(filters[nextIndex]);
+        buttonsRef.current[nextIndex]?.focus();
         break;
 
       case 'ArrowRight':
       case 'ArrowDown':
         e.preventDefault();
         nextIndex = index === filters.length - 1 ? 0 : index + 1;
-        onChange(filters[nextIndex]);
+        buttonsRef.current[nextIndex]?.focus();
         break;
 
       case 'Home':
         e.preventDefault();
-        onChange(filters[0]);
+        buttonsRef.current[0]?.focus();
         break;
 
       case 'End':
         e.preventDefault();
-        onChange(filters[filters.length - 1]);
+        buttonsRef.current[filters.length - 1]?.focus();
         break;
 
       case 'Enter':
@@ -75,34 +76,35 @@ export default function Filter({ value, onChange }: FilterProps) {
 
   return (
     <div 
-      className  = "filter" 
-      role       = "tablist" 
-      aria-label = "Filter tasks by status"
-      aria-live  = "polite"
+      className     = {styles.root}
+      role          = "radiogroup" 
+      aria-label    = "Filter tasks by status"
+      aria-controls = "filtered-projects"
     >
       {filters.map((filterValue, index) => (
-        <button
-          key           = {filterValue}
-          ref           = {el => buttonsRef.current[index] = el}
-          role          = "tab"
-          aria-selected = {value === filterValue}
-          aria-controls = "filtered-projects"
-          aria-label    = {filterDescriptions[filterValue]}
-          aria-current  = {value === filterValue ? 'page' : undefined}
-          onClick       = {() => onChange(filterValue)}
-          onKeyDown     = {(e) => handleKeyDown(e, index)}
-          tabIndex      = {value === filterValue ? 0 : -1}
-          data-status   = {filterValue}
-        >
-          {filterValue === 'all' ? null : (
-            <span className="icon-wrapper" aria-hidden="true">
-              {icons[filterValue as TaskStatus]}
+        <label key={filterValue} className={styles.label}>
+          <input
+            type       = "radio"
+            name       = "task-filter"
+            className  = {styles.radio}
+            ref        = {el => buttonsRef.current[index] = el as HTMLButtonElement}
+            value      = {filterValue}
+            checked    = {value === filterValue}
+            onChange   = {() => onChange(filterValue)}
+            onKeyDown  = {(e) => handleKeyDown(e, index)}
+            aria-label = {filterDescriptions[filterValue]}
+          />
+          <span className={styles.content} data-status={filterValue}>
+            {filterValue === 'all' ? null : (
+              <span aria-hidden="true">
+                {icons[filterValue as TaskStatus]}
+              </span>
+            )}
+            <span>
+              {filterValue.charAt(0).toUpperCase() + filterValue.slice(1)}
             </span>
-          )}
-          <span className="filter-text">
-            {filterValue.charAt(0).toUpperCase() + filterValue.slice(1)}
           </span>
-        </button>
+        </label>
       ))}
     </div>
   );

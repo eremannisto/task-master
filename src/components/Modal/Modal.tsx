@@ -4,43 +4,53 @@ import styles from './Modal.module.css';
 
 interface ModalProps {
   title: string;
+  children: React.ReactNode;
   isOpen: boolean;
   onClose: () => void;
-  children: React.ReactNode;
 }
 
-export const Modal = ({ title, isOpen, onClose, children }: ModalProps) => {
-  const modalRef = useRef<HTMLDialogElement>(null);
+export function Modal({ title, children, isOpen, onClose }: ModalProps) {
+  const dialogRef = useRef<HTMLDialogElement>(null);
+  const previousActiveElement = useRef<HTMLElement | null>(null);
 
   useEffect(() => {
-    const handleOverflow = () => {
-      document.body.style.overflow = isOpen ? 'hidden' : '';
-    };
+    const dialog = dialogRef.current;
+    if (!dialog) return;
 
     if (isOpen) {
-      modalRef.current?.showModal();
-      handleOverflow();
+      previousActiveElement.current = document.activeElement as HTMLElement;
+      dialog.showModal();
+      // Find the first focusable element and focus it
+      const focusable = dialog.querySelector<HTMLElement>('button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])');
+      if (focusable) {
+        focusable.focus();
+      }
     } else {
-      modalRef.current?.close();
-      handleOverflow();
+      dialog.close();
+      // Return focus to the element that was focused before the modal opened
+      if (previousActiveElement.current) {
+        previousActiveElement.current.focus();
+      }
     }
-
-    return () => {
-      document.body.style.overflow = '';
-    };
   }, [isOpen]);
+
+  const handleKeyDown = (event: React.KeyboardEvent) => {
+    if (event.key === 'Escape') {
+      onClose();
+    }
+  };
 
   return (
     <dialog 
-      ref={modalRef}
+      ref={dialogRef}
       className={styles.modal}
-      onClose={onClose}
-      onClick={(e) => {
-        if (e.target === modalRef.current) onClose();
-      }}
+      onKeyDown={handleKeyDown}
+      aria-labelledby="modal-title"
+      aria-modal="true"
+      role="dialog"
     >
       <header className={styles.header}>
-        <h2>{title}</h2>
+        <h2 id="modal-title">{title}</h2>
         <button 
           onClick={onClose}
           className={styles.close}
@@ -49,9 +59,9 @@ export const Modal = ({ title, isOpen, onClose, children }: ModalProps) => {
           <X aria-hidden="true" />
         </button>
       </header>
-      <div className={styles.content}>
+      <div className={styles.content} role="document">
         {children}
       </div>
     </dialog>
   );
-};
+}

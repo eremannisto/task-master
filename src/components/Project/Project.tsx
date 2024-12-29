@@ -1,15 +1,17 @@
-import { useState, useRef, useEffect, useCallback, useMemo, memo } from 'react';
+import { useState, useRef, useEffect, useCallback, useMemo, memo, forwardRef } from 'react';
 import { CircleDashed, CircleDot, CircleCheck, Trash, Plus, X, SquarePen, EyeOff } from 'lucide-react';
 import { TaskComponent, ProjectComponent, TaskStatus } from '@types';
 import { Modal } from '@components/Modal/Modal';
 import styles from './Project.module.css';
 
 interface ProjectProps {
+  id?: string;
   project: ProjectComponent;
   onDelete: (id: string) => void;
   onEdit?: (project: ProjectComponent) => void;
   onTaskUpdate: (tasks: TaskComponent[]) => void;
   filter: 'all' | TaskStatus;
+  onKeyDown?: (e: React.KeyboardEvent) => void;
 }
 
 /**
@@ -21,13 +23,15 @@ interface ProjectProps {
  * @param filter       : 'all' | TaskStatus
  * @returns 
  */
-export const Project = memo(({ 
+const ProjectBase = forwardRef<HTMLElement, ProjectProps>(({ 
+  id,
   project: initialProject, 
   onDelete, 
   onEdit, 
   onTaskUpdate,
-  filter
-}: ProjectProps) => {
+  filter,
+  onKeyDown
+}, ref) => {
 
   // Task state
   const [ tasks,             setTasks             ] = useState(initialProject?.tasks || []);
@@ -146,7 +150,15 @@ export const Project = memo(({
   }, [onDelete, initialProject.id]);
 
   return (
-    <article className={styles.project}>
+    <article 
+      ref={ref}
+      id={id}
+      className={styles.project}
+      tabIndex={0}
+      role="listitem"
+      aria-label={`Project: ${initialProject.name}`}
+      onKeyDown={onKeyDown}
+    >
       {/* Project Header */}
       <header>
         <div className={styles.details}>
@@ -156,16 +168,28 @@ export const Project = memo(({
       </header>
 
       {/* Task List */}
-      <ul className={styles.tasks} role="list">
+      <div 
+        className={styles.tasks} 
+        role="group"
+        aria-label={`Tasks for ${initialProject.name}`}
+      >
         {visibleTasks.map((task) => (
-          <li key={task.id} className={styles.task} data-status={task.status}>
+          <div 
+            key={task.id} 
+            className={styles.task} 
+            data-status={task.status}
+            role="group"
+            aria-label={`Task: ${task.description}`}
+          >
             {/* Task Status Toggle */}
             <button
               data-action="status"
               className={styles.statusButton}
               onClick={() => handleTaskStatusChange(task.id)}
               onKeyDown={(e) => handleTaskKeyDown(e, task.id)}
-              aria-label={`Change status of task: ${task.description}`}
+              aria-label={`Change status of task: ${task.description}. Current status: ${task.status}`}
+              role="switch"
+              aria-checked={task.status === 'done'}
             >
               <span data-icon="status">
                 {getTaskIcon(task.status)}
@@ -216,7 +240,7 @@ export const Project = memo(({
                 }
               }}
               rows={1}
-              aria-label="Task description"
+              aria-label={`Edit task description: ${task.description}`}
               style={{
                 resize: 'none',
                 overflow: 'hidden',
@@ -233,12 +257,16 @@ export const Project = memo(({
             >
               <X className={styles.icon} aria-hidden="true" />
             </button>
-          </li>
+          </div>
         ))}
 
         {/* Hidden Tasks Indicator */}
         {hiddenTasks > 0 && (
-          <li className={`${styles.task} ${styles["hidden-tasks"]}`}>
+          <div 
+            className={`${styles.task} ${styles["hidden-tasks"]}`}
+            role="status"
+            aria-live="polite"
+          >
             <div className={styles["fake-button"]} aria-hidden="true">
               <span data-icon="status">
                 <EyeOff className={styles.icon} aria-hidden="true" />
@@ -247,11 +275,15 @@ export const Project = memo(({
             <span className={styles.description}>
               {hiddenTasks} task{hiddenTasks !== 1 ? 's' : ''} hidden by filter
             </span>
-          </li>
+          </div>
         )}
 
         {/* New Task Input */}
-        <li className={`${styles.task}`}>
+        <div 
+          className={`${styles.task}`}
+          role="group"
+          aria-label="Add new task"
+        >
           <button
             data-action="status"
             className={styles.statusButton}
@@ -290,14 +322,15 @@ export const Project = memo(({
             }}
             placeholder="Add new task..."
             rows={1}
+            aria-label="Enter new task description"
             style={{
               resize: 'none',
               overflow: 'hidden',
               minHeight: '1.5em'
             }}
           />
-        </li>
-      </ul>
+        </div>
+      </div>
 
       {/* Project Actions */}
       <footer className={styles.actions}>
@@ -353,8 +386,9 @@ export const Project = memo(({
       )}
     </article>
   );
-}, (prevProps, nextProps) => {
-  // Only re-render if these actually changed
+});
+
+export const Project = memo(ProjectBase, (prevProps: ProjectProps, nextProps: ProjectProps) => {
   return (
     prevProps.project.id === nextProps.project.id &&
     prevProps.filter === nextProps.filter &&

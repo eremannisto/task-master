@@ -10,7 +10,9 @@
   padding-top: 2.8rem;
   transition: height 0.2s ease-out;
   height: auto;
-  min-height: 100px;
+  min-height: 10rem;
+  z-index: 2;
+  position: relative;
 
   & > header {
 
@@ -25,6 +27,7 @@
         color: var(--color-zinc-100);
         line-height: 1.2;
         flex-grow: 1;
+        margin: 0;
       }
 
       .description {

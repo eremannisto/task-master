@@ -120,7 +120,11 @@ export const Form = ({
   };
 
   return (
-    <form onSubmit={handleSubmit} className={styles.form}>
+    <form 
+      onSubmit={handleSubmit} 
+      className={styles.form}
+      aria-label={project ? "Edit Project" : "Create New Project"}
+    >
       <div className={styles.field}>
         <label htmlFor="id">Identifier</label>
         {project ? (
@@ -130,9 +134,10 @@ export const Form = ({
             value={id}
             disabled
             aria-label="Project Identifier (cannot be changed)"
+            aria-disabled="true"
           />
         ) : (
-          <div className={styles.idField}>
+          <div className={styles.idField} role="group" aria-labelledby="id">
             <input
               type="text"
               id="id"
@@ -144,10 +149,11 @@ export const Form = ({
               maxLength={60}
               aria-invalid={Boolean(idError)}
               aria-describedby={idError ? "id-error" : "id-help"}
+              aria-required="false"
               placeholder="Leave empty for auto-generated ID"
             />
             {idError ? (
-              <span id="id-error" className={styles.error}>
+              <span id="id-error" className={styles.error} role="alert">
                 {idError}
               </span>
             ) : (
@@ -169,7 +175,9 @@ export const Form = ({
           value={name}
           onChange={(e) => setName(e.target.value)}
           required
+          aria-required="true"
           autoFocus
+          aria-label="Project name"
         />
       </div>
 
@@ -180,15 +188,26 @@ export const Form = ({
           value={description}
           onChange={(e) => setDescription(e.target.value)}
           required
+          aria-required="true"
           rows={3}
+          aria-label="Project description"
         />
       </div>
 
       <div className={styles.actions}>
-        <button type="button" onClick={onCancel} data-action="secondary">
+        <button 
+          type="button" 
+          onClick={onCancel} 
+          data-action="secondary"
+          aria-label="Cancel form"
+        >
           Cancel
         </button>
-        <button type="submit" data-action="primary">
+        <button 
+          type="submit" 
+          data-action="primary"
+          aria-label={project ? "Save project changes" : "Create new project"}
+        >
           {project ? 'Save Changes' : 'Create Project'}
         </button>
       </div>

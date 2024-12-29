@@ -35,7 +35,7 @@ export default function TaskManager() {
   const [editingProject, setEditingProject] = useState<ProjectComponent | null>(null);
   const [isModalOpen,    setIsModalOpen]    = useState(false);
 
-  const projectRefs   = useRef<Map<string, HTMLDivElement>>(new Map());
+  const projectRefs   = useRef<Map<string, HTMLElement>>(new Map());
   const itemPositions = useRef<Map<string, ItemPosition>>(new Map());
   const containerRef  = useRef<HTMLElement>(null);
 
@@ -263,27 +263,20 @@ export default function TaskManager() {
 
   // Render individual project for Masonry grid
   const renderProject = useCallback(({ data: project}: { data: ProjectComponent, index: number }) => (
-    <div 
+    <Project
       ref={el => el && projectRefs.current.set(project.id, el)}
       key={getStableKey(project)}
       id={getStableKey(project)}
-      className="project-container"
-      tabIndex={0}
-      role="listitem"
-      aria-label={`Project: ${project.name}`}
+      project={project}
+      onDelete={handleDelete}
+      onEdit={(project) => {
+        setEditingProject(project);
+        setIsModalOpen(true);
+      }}
+      onTaskUpdate={(newTasks) => handleTaskUpdate(project.id, newTasks)}
+      filter={filter}
       onKeyDown={(e) => handleProjectKeyDown(e, project.id)}
-    >
-      <Project
-        project={project}
-        onDelete={handleDelete}
-        onEdit={(project) => {
-          setEditingProject(project);
-          setIsModalOpen(true);
-        }}
-        onTaskUpdate={(newTasks) => handleTaskUpdate(project.id, newTasks)}
-        filter={filter}
-      />
-    </div>
+    />
   ), [handleDelete, handleTaskUpdate, filter, handleProjectKeyDown]);
 
   return (
@@ -303,18 +296,20 @@ export default function TaskManager() {
         className="projects-container" 
         id="filtered-projects"
         role="list"
-        aria-label="Projects list"
+        aria-label="Projects"
       >
         {isLoading ? (
-          <Masonry
-            items={generateSkeletonItems(10)}
-            columnGutter={8}
-            columnWidth={300}
-            render={() => <ProjectSkeleton/>}
-            overscanBy={2}
-            maxColumnCount={4}
-            rowGutter={8}
-          />
+          <div aria-label="Loading projects" role="status">
+            <Masonry
+              items={generateSkeletonItems(10)}
+              columnGutter={8}
+              columnWidth={300}
+              render={() => <ProjectSkeleton/>}
+              overscanBy={2}
+              maxColumnCount={4}
+              rowGutter={8}
+            />
+          </div>
         ) : filteredProjects.length > 0 ? (
           <Masonry
             key={filteredProjects.map(p => p.id).join(',')}
@@ -329,7 +324,11 @@ export default function TaskManager() {
             onRender={handleMasonryRender}
           />
         ) : (
-          <div className="no-results">
+          <div 
+            className="no-results"
+            role="status"
+            aria-live="polite"
+          >
             <p>
               {filter === 'all' 
                 ? "No projects found. Create your first project!"
@@ -341,6 +340,7 @@ export default function TaskManager() {
                 className="create-project-button"
                 onClick={() => setIsModalOpen(true)}
                 aria-label="Create new project"
+                aria-haspopup="dialog"
               >
                 <Plus aria-hidden="true" />
                 <span>New Project</span>

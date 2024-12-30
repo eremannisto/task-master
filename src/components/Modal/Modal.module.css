@@ -1,7 +1,7 @@
 .modal {
   flex-direction: column;
-  gap: 1.6rem;
-  padding: 1.6rem;
+  gap: 0.8rem;
+  padding: 2.4rem 1.6rem 1.6rem 1.6rem;
   border: none;
   border-radius: 8px;
   background: var(--color-zinc-900);
@@ -23,39 +23,72 @@
 .header {
   display: flex;
   justify-content: space-between;
-  align-items: center;
+  align-items: flex-start;
 
-  h2 {
-    font-size: 1.8rem;
-    font-weight: 500;
-    color: var(--color-zinc-50);
-    margin: 0;
+  &.form {
+    padding: 0 0 2rem 0;
+    border-bottom: 2px dashed var(--color-zinc-700);
+    gap: 2rem;
+    margin-bottom: 0.8rem;
+
+    & > div {
+      display: flex;
+      flex-direction: column;
+      gap: 0.4rem;
+    }
+
+    h2 {
+      font-size: 1.6rem;
+      font-weight: 600;
+      color: var(--color-zinc-50);
+      margin: 0;
+    }
   }
 
-  .close {
-    background: none;
-    border: none;
-    padding: 0.4rem;
+  &.default {
+    gap: 2rem;
+
+    h2 {
+      font-size: 1.8rem;
+      font-weight: 600;
+      color: var(--color-zinc-50);
+      margin: 0;
+    }
+  }
+
+  .description {
+    font-size: 1.4rem;
     color: var(--color-zinc-400);
-    cursor: pointer;
-    border-radius: 4px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
+    line-height: 1.5;
+  }
+}
 
-    &:hover {
-      color: var(--color-zinc-200);
-      background: color-mix(in srgb, var(--color-zinc-400), transparent 90%);
-    }
+.close {
+  background: none;
+  border: none;
+  padding: 0.4rem;
+  color: var(--color-zinc-400);
+  cursor: pointer;
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  aspect-ratio: 1/1;
+  width: 2.4rem;
+  height: 2.4rem;
 
-    &:focus-visible {
-      outline: 2px solid var(--focus-ring-color);
-      outline-offset: 2px;
-    }
+  &:hover {
+    color: var(--color-zinc-200);
+    background: color-mix(in srgb, var(--color-zinc-400), transparent 90%);
+  }
 
-    svg {
-      width: 2rem;
-      height: 2rem;
-    }
+  &:focus-visible {
+    outline: 2px solid var(--focus-ring-color);
+    outline-offset: 2px;
+  }
+
+  svg {
+    width: 2rem;
+    height: 2rem;
   }
 }

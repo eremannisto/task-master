@@ -4,12 +4,21 @@ import styles from './Modal.module.css';
 
 interface ModalProps {
   title: string;
+  description?: string;
   children: React.ReactNode;
   isOpen: boolean;
   onClose: () => void;
+  variant?: 'default' | 'form';
 }
 
-export function Modal({ title, children, isOpen, onClose }: ModalProps) {
+export function Modal({ 
+  title, 
+  description, 
+  children, 
+  isOpen, 
+  onClose,
+  variant = 'default'
+}: ModalProps) {
   const dialogRef = useRef<HTMLDialogElement>(null);
   const previousActiveElement = useRef<HTMLElement | null>(null);
 
@@ -46,11 +55,19 @@ export function Modal({ title, children, isOpen, onClose }: ModalProps) {
       className={styles.modal}
       onKeyDown={handleKeyDown}
       aria-labelledby="modal-title"
+      aria-describedby={description ? "modal-description" : undefined}
       aria-modal="true"
       role="dialog"
     >
-      <header className={styles.header}>
-        <h2 id="modal-title">{title}</h2>
+      <header className={`${styles.header} ${styles[variant]}`}>
+        <div>
+          <h2 id="modal-title">{title}</h2>
+          {description && (
+            <p id="modal-description" className={styles.description}>
+              {description}
+            </p>
+          )}
+        </div>
         <button 
           onClick={onClose}
           className={styles.close}

@@ -2,6 +2,9 @@ import { useState, useRef, useEffect, useCallback, useMemo, memo, forwardRef } f
 import { CircleDashed, CircleDot, CircleCheck, Trash, Plus, X, SquarePen, EyeOff } from 'lucide-react';
 import { TaskComponent, ProjectComponent, TaskStatus } from '@types';
 import { Modal } from '@components/Modal/Modal';
+import { generateId } from '@utils/generateId';
+import { Form } from '@components/Form/Form.component';
+import { Button } from '@components/Button/Button.component';
 import styles from './Project.module.css';
 
 interface ProjectProps {
@@ -286,7 +289,7 @@ const ProjectBase = forwardRef<HTMLElement, ProjectProps>(({
 
         {/* New Task Input */}
         <div 
-          className={`${styles.task}`}
+          className={`${styles.task} ${styles["new-task"]}`}
           role="group"
           aria-label="Add new task"
         >
@@ -300,7 +303,7 @@ const ProjectBase = forwardRef<HTMLElement, ProjectProps>(({
           </button>
           <textarea
             ref={newTaskTextareaRef}
-            className={styles.description}
+            className={`${styles.description} ${styles["new-task-description"]}`}
             value={newTaskText}
             onChange={(e) => {
               setNewTaskText(e.target.value);
@@ -332,7 +335,8 @@ const ProjectBase = forwardRef<HTMLElement, ProjectProps>(({
             style={{
               resize: 'none',
               overflow: 'hidden',
-              minHeight: '1.5em'
+              minHeight: '1.5em',
+              outline: 'none'
             }}
           />
         </div>
@@ -340,26 +344,24 @@ const ProjectBase = forwardRef<HTMLElement, ProjectProps>(({
 
       {/* Project Actions */}
       <footer className={styles.actions}>
-        <button 
-          className={styles.edit} 
-          data-action="edit" 
-          onClick={() => onEdit?.(initialProject)} 
-          aria-haspopup="true" 
-          aria-label="Edit project"
-        >
-          <SquarePen className={styles.icon} aria-hidden="true" />
-          <span className={styles.label}>Edit</span>
-        </button>
-        <button 
-          className={styles.delete} 
-          data-action="delete" 
-          onClick={() => setShowDeleteConfirm(true)} 
-          aria-haspopup="true" 
-          aria-label="Delete project"
-        >
-          <Trash className={styles.icon} aria-hidden="true" />
-          <span className={styles.label}>Delete</span>
-        </button>
+        <Button 
+          icon={SquarePen}
+          title="Edit"
+          theme="zinc"
+          variant="solid"
+          onClick={() => onEdit?.(initialProject)}
+          aria-haspopup="true"
+          className={`${styles["project-action"]} ${styles["project-edit"]}`}
+        />
+        <Button 
+          icon={Trash}
+          title="Delete"
+          theme="red"
+          variant="solid"
+          onClick={() => setShowDeleteConfirm(true)}
+          aria-haspopup="true"
+          className={`${styles["project-action"]} ${styles["project-delete"]}`}
+        />
       </footer>
 
       {/* Delete Confirmation Modal */}
@@ -370,22 +372,24 @@ const ProjectBase = forwardRef<HTMLElement, ProjectProps>(({
           onClose={() => setShowDeleteConfirm(false)}
         >
           <div className={styles.confirmDelete}>
-            <p>Are you sure you want to delete "{initialProject.name}"?</p>
-            <p className={styles.warning}>This action cannot be undone.</p>
+            <p>This action cannot be undone. Are you sure you want to delete <strong>{initialProject.name}</strong>?</p>
             
             <div className={styles.confirmActions}>
-              <button 
+              <Button
+                size="medium"
+                title="Cancel"
+                variant="solid"
+                theme="zinc"
                 onClick={() => setShowDeleteConfirm(false)}
-                data-action="secondary"
-              >
-                Cancel
-              </button>
-              <button 
+              />
+              <Button
+                size="medium"
+                icon={Trash}
+                title="Delete Project"
+                variant="solid"
+                theme="red"
                 onClick={handleConfirmDelete}
-                data-action="danger"
-              >
-                Delete Project
-              </button>
+              />
             </div>
           </div>
         </Modal>
@@ -401,3 +405,138 @@ export const Project = memo(ProjectBase, (prevProps: ProjectProps, nextProps: Pr
     JSON.stringify(prevProps.project.tasks) === JSON.stringify(nextProps.project.tasks)
   );
 });
+
+
+// Project Form
+// Validation types and utilities
+interface ValidationOptions {
+  allowLetters    : boolean;     // Allow a-z, A-Z
+  allowNumbers    : boolean;     // Allow 0-9
+  allowCharacters : string[];    // Array of allowed special characters
+  minimumLength   : number;      // Minimum length
+  maximumLength   : number;      // Maximum length
+}
+
+const DEFAULT_VALIDATION: ValidationOptions = {
+  allowLetters    : true,
+  allowNumbers    : true,
+  allowCharacters : ['-'],  // Only allow dashes as special characters
+  minimumLength   : 3,
+  maximumLength   : 60
+};
+
+const validateId = (value: string, options: ValidationOptions = DEFAULT_VALIDATION): string | null => {
+  if (!value) return null; // Allow empty for auto-generation
+  
+  if (value.length < options.minimumLength) {
+    return `ID must be at least ${options.minimumLength} characters. Only letters (a-zA-Z), numbers (0-9), and dashes (-) are allowed`;
+  }
+  
+  if (value.length > options.maximumLength) {
+    return `ID cannot exceed ${options.maximumLength} characters. Only letters (a-zA-Z), numbers (0-9), and dashes (-) are allowed`;
+  }
+
+  const allowedChars = new RegExp(
+    `^[${options.allowLetters ? 'a-zA-Z' : ''}${options.allowNumbers ? '0-9' : ''}${options.allowCharacters.map(c => `\\${c}`).join('')}]*$`
+  );
+
+  if (!allowedChars.test(value)) {
+    return `ID can only contain letters (az-AZ), numbers (0-9), and dashes (-)`;
+  }
+
+  return null;
+};
+
+interface ProjectFormProps {
+  project?: ProjectComponent;
+  onSubmit: (data: Omit<ProjectComponent, 'tasks'>) => void;
+  onCancel: () => void;
+  idValidation?: ValidationOptions;
+  existingIds?: string[]; // Add this to check for uniqueness
+}
+
+export const ProjectForm = ({ 
+  project, 
+  onSubmit, 
+  onCancel, 
+  idValidation = DEFAULT_VALIDATION,
+  existingIds = []
+}: ProjectFormProps) => {
+  const handleSubmit = (values: { id?: string; name: string; description: string }) => {
+    // When editing, use the existing project ID
+    const submissionId = project ? project.id : (values.id?.trim() || generateId());
+    
+    if (!project) { // Only validate ID for new projects
+      const error = validateId(submissionId, idValidation);
+      if (error) {
+        return { id: error };
+      }
+
+      if (existingIds.includes(submissionId)) {
+        return { id: 'This ID is already in use' };
+      }
+    }
+
+    onSubmit({
+      id: submissionId,
+      name: values.name.trim(),
+      description: values.description.trim(),
+    });
+  };
+
+  return (
+    <Form
+      config={{
+        ...(project ? {} : {
+          id: {
+            label: 'Project ID',
+            type: 'text' as const,
+            placeholder: 'Enter ID or leave empty for auto-generation',
+            readOnly: !!project,
+            validation: {
+              required: false,
+              validate: (value: string) => {
+                if (!value) return true; // Allow empty for new projects
+                const error = validateId(value, idValidation);
+                if (error) return error;
+                
+                // Check uniqueness only for new projects
+                if (existingIds.includes(value)) {
+                  return 'This ID is already in use';
+                }
+                return true;
+              }
+            }
+          }
+        }),
+        name: {
+          label: 'Project name',
+          type: 'text' as const,
+          placeholder: 'Enter project name',
+          autoFocus: true,
+          validation: {
+            required: true,
+            minLength: 3,
+            maxLength: 80
+          }
+        },
+        description: {
+          label: 'Project description',
+          type: 'textarea' as const,
+          placeholder: 'Enter project description',
+          rows: 3,
+          validation: {
+            required: true,
+            minLength: 1,
+            maxLength: 160
+          }
+        }
+      }}
+      initialValues={project}
+      onSubmit={handleSubmit}
+      onCancel={onCancel}
+      submitLabel={project ? 'Save Changes' : 'Create Project'}
+      cancelLabel="Cancel"
+    />
+  );
+};

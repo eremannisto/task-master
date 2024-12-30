@@ -1,0 +1,86 @@
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+  width: 100%;
+  max-width: 60rem;
+  margin: 0 auto;
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.8rem;
+}
+
+.field label {
+  font-weight: 500;
+  color: var(--color-zinc-300);
+  font-size: 1.4rem;
+}
+
+.field input,
+.field textarea {
+  padding: 1.2rem;
+  background: var(--color-zinc-900);
+  border: 1px solid var(--color-zinc-800);
+  border-radius: 6px;
+  color: var(--color-zinc-50);
+  font-size: 1.6rem;
+  transition: all 0.2s ease;
+  width: 100%;
+  font-weight: 500;
+}
+
+.field textarea {
+  resize: vertical;
+  min-height: 10rem;
+}
+
+.field input:hover,
+.field textarea:hover {
+  border-color: var(--color-zinc-700);
+}
+
+.field input:focus,
+.field textarea:focus {
+  border-color: var(--color-zinc-700);
+  outline: none;
+  box-shadow: 0 0 0 2px var(--color-blue-500/0.1);
+}
+
+.field input:disabled,
+.field textarea:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  background: var(--color-zinc-800);
+}
+
+.field input[aria-invalid="true"],
+.field textarea[aria-invalid="true"] {
+  border-color: var(--color-red-500);
+}
+
+.field input[aria-invalid="true"]:focus,
+.field textarea[aria-invalid="true"]:focus {
+  box-shadow: 0 0 0 2px var(--color-red-500/0.1);
+}
+
+.error {
+  color: var(--color-red-400);
+  font-size: 1.4rem;
+  margin-top: -0.4rem;
+}
+
+.help {
+  color: var(--color-zinc-500);
+  font-size: 1.4rem;
+  margin-top: -0.4rem;
+}
+
+.actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 1.2rem;
+  margin-top: 1rem;
+}

@@ -2,14 +2,13 @@ import type { ProjectComponent, TaskComponent, TaskStatus }  from '@types';
 import { useState, useEffect, useCallback, useMemo, useRef } from 'react';
 
 // Components
-import { Masonry }             from '@components/Masonry/Masonry';
-import { Modal }               from '@components/Modal/Modal';
-import { Button }              from '@components/Button/Button.component';
-import { Filter }              from '@components/Filter/Filter.component';
-import { FilterSkeleton }      from '@components/Filter/Filter.skeleton';
-import { Project }             from '@components/Project/Project.component';
-import { ProjectSkeleton }     from '@components/Project/Project.skeleton';
-import { Form as ProjectForm } from '@components/Project/Form/Form';
+import { Masonry }              from '@components/Masonry/Masonry';
+import { Modal }                from '@components/Modal/Modal';
+import { Button }               from '@components/Button/Button.component';
+import { Filter }               from '@components/Filter/Filter.component';
+import { FilterSkeleton }       from '@components/Filter/Filter.skeleton';
+import { Project, ProjectForm } from '@components/Project/Project.component';
+import { ProjectSkeleton }      from '@components/Project/Project.skeleton';
 
 // Icons
 import { PlusCircle } from 'lucide-react';
@@ -169,6 +168,15 @@ export default function TaskManager({ initialModalOpen = false, onModalClose }: 
     />
   ), [handleDelete, handleTaskUpdate, filter, handleProjectKeyDown]);
 
+  // Update the validation options where it's used
+  const idValidation = {
+    allowLetters: true,
+    allowNumbers: true,
+    allowCharacters: ['-', '_'],
+    minimumLength: 3,
+    maximumLength: 60
+  };
+
   return (
     <>
       <section className={styles.section}>
@@ -247,6 +255,11 @@ export default function TaskManager({ initialModalOpen = false, onModalClose }: 
       {/* Project Creation/Edit Modal */}
       <Modal 
         title={editingProject ? 'Edit Project' : 'New Project'}
+        description={editingProject 
+          ? 'Update your project details below.' 
+          : 'Create a new project by filling out the form below. You can leave the ID empty to auto-generate one.'
+        }
+        variant="form"
         isOpen={isModalOpen}
         onClose={() => {
           setIsModalOpen(false);
@@ -255,7 +268,7 @@ export default function TaskManager({ initialModalOpen = false, onModalClose }: 
         }}
       >
         <ProjectForm
-          key={editingProject?.id || 'new'}
+          key={editingProject?.id || Date.now()}
           project={editingProject ?? undefined}
           onSubmit={editingProject ? handleEditProject : handleCreateProject}
           onCancel={() => {
@@ -263,16 +276,8 @@ export default function TaskManager({ initialModalOpen = false, onModalClose }: 
             setEditingProject(null);
             onModalClose?.();
           }}
-          idValidation={{
-            allowLetters: true,
-            allowNumbers: true,
-            allowDashes : true,
-            allowSpaces : false,
-            allowDots   : false,
-            allowUnderscores: false,
-            minLength: 3,
-            maxLength: 60
-          }}
+          idValidation={idValidation}
+          existingIds={projects.map(p => p.id)}
         />
       </Modal>
     </>

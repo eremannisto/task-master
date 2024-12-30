@@ -28,6 +28,7 @@ export default defineConfig({
       '@data'       : path.resolve(__dirname, './src/data.ts'),
       '@styles'     : path.resolve(__dirname, './src/styles'),
       '@types'      : path.resolve(__dirname, './src/types.ts'),
+      '@utils'      : path.resolve(__dirname, './src/utils')
     },
   },
 })

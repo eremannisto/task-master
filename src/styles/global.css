@@ -1,5 +1,7 @@
 :root {
 
+  color-scheme: dark;
+
   /* Fonts */
   --fs-base   : calc(10 / 16 * 100%);
   --fm-sans   : 'Inter', sans-serif;

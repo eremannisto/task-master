@@ -76,7 +76,7 @@ export default function Filter({ value, onChange }: FilterProps) {
 
   return (
     <div 
-      className     = {styles.root}
+      className     = {styles.filters}
       role          = "radiogroup" 
       aria-label    = "Filter tasks by status"
       aria-controls = "filtered-projects"

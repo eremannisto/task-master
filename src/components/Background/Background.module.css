@@ -7,7 +7,7 @@
   user-select   : none;
   pointer-events: none;
 
-  &.dotted {
+  &[data-variant="dotted"] {
     background-image: radial-gradient(
       color-mix(in srgb, var(--color-zinc-50), transparent 95%) 1px,
       transparent 0 );

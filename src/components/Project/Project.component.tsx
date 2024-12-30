@@ -1,7 +1,7 @@
 import { useState, useRef, useEffect, useCallback, useMemo, memo, forwardRef } from 'react';
 import { CircleDashed, CircleDot, CircleCheck, Trash, Plus, X, SquarePen, EyeOff } from 'lucide-react';
 import { TaskComponent, ProjectComponent, TaskStatus } from '@types';
-import { Modal } from '@components/Modal/Modal';
+import { Modal } from '@/components/Modal/Modal.component';
 import { generateId } from '@utils/generateId';
 import { Form } from '@components/Form/Form.component';
 import { Button } from '@components/Button/Button.component';

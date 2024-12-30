@@ -2,8 +2,8 @@ import type { ProjectComponent, TaskComponent, TaskStatus }  from '@types';
 import { useState, useEffect, useCallback, useMemo, useRef } from 'react';
 
 // Components
-import { Masonry }              from '@components/Masonry/Masonry';
-import { Modal }                from '@components/Modal/Modal';
+import { Masonry }              from '@/components/Masonry/Masonry.component';
+import { Modal }                from '@/components/Modal/Modal.component';
 import { Button }               from '@components/Button/Button.component';
 import { Filter }               from '@components/Filter/Filter.component';
 import { FilterSkeleton }       from '@components/Filter/Filter.skeleton';

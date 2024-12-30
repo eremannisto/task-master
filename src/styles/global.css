@@ -1,7 +1,7 @@
 :root {
 
   /* Fonts */
-  --fs-base   : 62.5%;
+  --fs-base   : calc(10 / 16 * 100%);
   --fm-sans   : 'Inter', sans-serif;
   --fm-display: 'Inter-Display', sans-serif;
   --fm-mono   : ui-monospace, monospace;
@@ -44,32 +44,8 @@
   }
 }
 
-/* Large displays (11/16) */
-@media (min-width: 1024px) {
-  html {
-    font-size: 68.75%;
-  }
-}
-
-/* Small displays (10/16) */
-@media (min-width: 768px) {
-  html {
-    font-size: 62.5%;
-  }
-}
-
-/* Extra small displays (9/16) */
-@media (min-width: 480px) {
-  html {
-    font-size: 56.25%;
-  }
-}
-
-/* Mobile displays (8/16) */
-@media (max-width: 480px) {
-  html {
-    font-size: 50%;
-  }
+html, body {
+  font-size: var(--fs-base);
 }
 
 body {
@@ -83,6 +59,42 @@ body {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
+
+/* Mobile displays (8/16) */
+@media (max-width: 480px) {
+  html, body {
+    font-size: calc(9 / 16 * 100%);
+  }
+}
+
+/* Extra small displays (9/16) */
+@media (min-width: 480px) {
+  html, body {
+    font-size: calc(9 / 16 * 100%);
+  }
+}
+
+/* Small displays (10/16) */
+@media (min-width: 768px) {
+  html, body {
+    font-size: calc(10 / 16 * 100%);
+  }
+}
+
+/* Large displays (11/16) */
+@media (min-width: 1024px) {
+  html, body {
+    font-size: calc(11 / 16 * 100%);
+  }
+}
+
+/* Large displays (12/16) */
+@media (min-width: 1280px) {
+  html, body {
+    font-size: calc(11.5 / 16 * 100%);
+  }
+}
+
 
 h1, h2, h3, h4, h5, h6 {
   font-family: var(--fm-display);

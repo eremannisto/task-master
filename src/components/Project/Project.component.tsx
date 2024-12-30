@@ -164,7 +164,6 @@ const ProjectBase = forwardRef<HTMLElement, ProjectProps>(({
       id={id}
       className={styles.project}
       tabIndex={0}
-      role="listitem"
       aria-label={`Project: ${initialProject.name}`}
       onKeyDown={onKeyDown}
     >

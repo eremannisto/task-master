@@ -76,23 +76,22 @@ export const Filter = ({ value, onChange }: FilterProps) => {
 
   return (
     <div 
-      className     = {styles.filters}
-      role          = "radiogroup" 
-      aria-label    = "Filter tasks by status"
-      aria-controls = "filtered-projects"
+      className={styles.filters}
+      role="group"
+      aria-label="Filter tasks by status"
     >
       {filters.map((filterValue, index) => (
         <label key={filterValue} className={styles.label}>
           <input
-            type       = "radio"
-            name       = "task-filter"
-            className  = {styles.radio}
-            ref        = {el => buttonsRef.current[index] = el as HTMLButtonElement}
-            value      = {filterValue}
-            checked    = {value === filterValue}
-            onChange   = {() => onChange(filterValue)}
-            onKeyDown  = {(e) => handleKeyDown(e, index)}
-            aria-label = {filterDescriptions[filterValue]}
+            type="radio"
+            name="task-filter"
+            className={styles.radio}
+            ref={el => buttonsRef.current[index] = el as HTMLButtonElement}
+            value={filterValue}
+            checked={value === filterValue}
+            onChange={() => onChange(filterValue)}
+            onKeyDown={(e) => handleKeyDown(e, index)}
+            aria-label={filterDescriptions[filterValue]}
           />
           <span className={styles.content} data-status={filterValue}>
             {filterValue === 'all' ? null : (

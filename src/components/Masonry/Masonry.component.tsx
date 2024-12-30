@@ -77,16 +77,16 @@ export function Masonry<T>({
       if (!['ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown'].includes(e.key)) return;
       
       const activeElement = document.activeElement;
-      // Only handle arrow keys when focused on the article element itself
-      if (!activeElement?.matches('article[role="list"]')) return;
+      // Only handle arrow keys when focused on the article element
+      if (!activeElement?.matches('article')) return;
 
       const columns = Array.from(containerRef.current?.querySelectorAll(`.${styles.column}`) || []);
       const currentColumn = activeElement.closest(`.${styles.column}`);
       if (!currentColumn) return;
 
       const currentColumnIndex = columns.indexOf(currentColumn as Element);
-      const itemsInCurrentColumn = Array.from(currentColumn.querySelectorAll(`.${styles.item}`));
-      const currentItemIndex = itemsInCurrentColumn.findIndex(item => item.contains(activeElement));
+      const itemsInCurrentColumn = Array.from(currentColumn.querySelectorAll('article'));
+      const currentItemIndex = itemsInCurrentColumn.findIndex(item => item === activeElement);
       
       e.preventDefault();
       let nextElement: HTMLElement | undefined;
@@ -95,34 +95,33 @@ export function Masonry<T>({
         case 'ArrowLeft':
           if (currentColumnIndex > 0) {
             const prevColumn = columns[currentColumnIndex - 1];
-            const itemsInPrevColumn = prevColumn.querySelectorAll(`.${styles.item}`);
-            const targetItem = itemsInPrevColumn[Math.min(currentItemIndex, itemsInPrevColumn.length - 1)];
-            nextElement = targetItem?.querySelector('article[role="listitem"]') as HTMLElement;
+            const itemsInPrevColumn = Array.from(prevColumn.querySelectorAll('article'));
+            nextElement = itemsInPrevColumn[Math.min(currentItemIndex, itemsInPrevColumn.length - 1)] as HTMLElement;
           }
           break;
         case 'ArrowRight':
           if (currentColumnIndex < columns.length - 1) {
             const nextColumn = columns[currentColumnIndex + 1];
-            const itemsInNextColumn = nextColumn.querySelectorAll(`.${styles.item}`);
-            const targetItem = itemsInNextColumn[Math.min(currentItemIndex, itemsInNextColumn.length - 1)];
-            nextElement = targetItem?.querySelector('article[role="listitem"]') as HTMLElement;
+            const itemsInNextColumn = Array.from(nextColumn.querySelectorAll('article'));
+            nextElement = itemsInNextColumn[Math.min(currentItemIndex, itemsInNextColumn.length - 1)] as HTMLElement;
           }
           break;
         case 'ArrowUp':
           if (currentItemIndex > 0) {
-            const targetItem = itemsInCurrentColumn[currentItemIndex - 1];
-            nextElement = targetItem?.querySelector('article[role="listitem"]') as HTMLElement;
+            nextElement = itemsInCurrentColumn[currentItemIndex - 1] as HTMLElement;
           }
           break;
         case 'ArrowDown':
           if (currentItemIndex < itemsInCurrentColumn.length - 1) {
-            const targetItem = itemsInCurrentColumn[currentItemIndex + 1];
-            nextElement = targetItem?.querySelector('article[role="listitem"]') as HTMLElement;
+            nextElement = itemsInCurrentColumn[currentItemIndex + 1] as HTMLElement;
           }
           break;
       }
 
-      focusWithScroll(nextElement);
+      if (nextElement) {
+        e.preventDefault();
+        focusWithScroll(nextElement);
+      }
     };
 
     document.addEventListener('keydown', handleKeyDown);
@@ -131,17 +130,12 @@ export function Masonry<T>({
 
   // Create columns with correct item distribution
   const columns = Array.from({ length: columnCount }, () => [] as T[]);
-  const rowCount = Math.ceil(items.length / columnCount);
   
-  // Fill columns in row-first order for correct tab sequence
-  for (let row = 0; row < rowCount; row++) {
-    for (let col = 0; col < columnCount; col++) {
-      const index = row * columnCount + col;
-      if (index < items.length) {
-        columns[col].push(items[index]);
-      }
-    }
-  }
+  // Fill columns vertically for correct up/down navigation
+  items.forEach((item, index) => {
+    const columnIndex = index % columnCount;
+    columns[columnIndex].push(item);
+  });
 
   return (
     <div 
@@ -151,6 +145,7 @@ export function Masonry<T>({
         '--gap': `${gap}rem`,
         '--columns': columnCount
       } as React.CSSProperties}
+      aria-label="Projects"
     >
       {columns.map((column, colIndex) => (
         <div key={colIndex} className={styles.column}>

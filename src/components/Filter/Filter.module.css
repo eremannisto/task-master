@@ -81,3 +81,19 @@
     background: var(--background-hover);
   } 
 }
+
+.filters[data-skeleton="true"] {
+  width: 100%;
+  max-width: 40rem;
+  min-height: 4rem;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: rowx;
+  gap: 0.8rem;
+  padding: 0.8rem;
+  pointer-events: none;
+
+  .label {
+    width: 100%;
+  }
+}

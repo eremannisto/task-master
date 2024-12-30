@@ -12,8 +12,8 @@
   --fs-fluid-md   : clamp(2rem,     0.61vi  + 1.76rem,  2.53rem);
   --fs-fluid-lg   : clamp(2.5rem,   1vi     + 2.1rem,   3.38rem);
   --fs-fluid-xl   : clamp(3.13rem,  1.56vi  + 2.5rem,   4.5rem);
-  --fs-fluid-xxl  : clamp(3.91rem,  2.38vi  + 2.96rem,  6rem);
-  --fs-fluid-xxxl : clamp(4.88rem,  3.54vi  + 3.47rem,  8rem);
+  --fs-fluid-xxl  : clamp(3.91rem,  2.38vi  + 2.96rem,  5.2rem);
+  --fs-fluid-xxxl : clamp(4.88rem,  3.54vi  + 3.47rem,  6rem);
 
   /* Miscellaneous */
   --max-width        : 120rem;
@@ -26,6 +26,7 @@
   --space-300: 2.4rem;
   --space-400: 3.2rem;
   --space-500: 4.0rem;
+  --space-600: 4.8rem;
 
   /* Colors */
   --color-focus         : var(--color-blue-300);

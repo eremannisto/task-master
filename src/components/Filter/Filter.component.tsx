@@ -22,7 +22,7 @@ interface FilterProps {
   onChange : (value: FilterValue) => void;
 }
 
-export default function Filter({ value, onChange }: FilterProps) {
+export const Filter = ({ value, onChange }: FilterProps) => {
   const filters: FilterValue[] = ['all', 'todo', 'doing', 'done'];
   const buttonsRef           = useRef<(HTMLButtonElement | null)[]>([]);
   const isKeyboardNavigation = useRef(false);

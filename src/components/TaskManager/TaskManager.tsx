@@ -1,43 +1,44 @@
-import type { ProjectComponent, TaskComponent, TaskStatus } from '@types';
+import type { ProjectComponent, TaskComponent, TaskStatus }  from '@types';
 import { useState, useEffect, useCallback, useMemo, useRef } from 'react';
-import { Masonry }  from 'masonic';
+
+// Components
+import { Masonry }             from '@components/Masonry/Masonry';
+import { Modal }               from '@components/Modal/Modal';
+import { Button }              from '@components/Button/Button.component';
+import { Filter }              from '@components/Filter/Filter.component';
+import { FilterSkeleton }      from '@components/Filter/Filter.skeleton';
+import { Project }             from '@components/Project/Project.component';
+import { ProjectSkeleton }     from '@components/Project/Project.skeleton';
 import { Form as ProjectForm } from '@components/Project/Form/Form';
-import { Project }  from '@components/Project/Project';
-import { Modal }    from '@components/Modal/Modal';
-import Filter       from '@components/Filter/Filter';
-import Navigation from '@components/Navigation/Navigation';
-import { ProjectSkeleton } from '@components/Project/Project.skeleton';
-import { Plus } from 'lucide-react';
-import './TaskManager.css';
 
-// Generate stable keys for Masonry grid items to prevent unnecessary re-renders
-const getStableKey = (project: ProjectComponent | { id: string }) => `project-${project.id}`;
+// Icons
+import { PlusCircle } from 'lucide-react';
 
-// Interface for storing position information
-interface ItemPosition {
-  id    : string;
-  x     : number;
-  y     : number;
-  width : number;
-  height: number;
+// Styles
+import styles from './TaskManager.module.css';
+
+interface TaskManagerProps {
+  initialModalOpen?: boolean;
+  onModalClose?: () => void;
 }
 
-// Generate skeleton items for Masonry grid
-const generateSkeletonItems = (count: number) => Array.from({ length: count }, (_, i) => ({
-  id: `skeleton-${i}`
-}));
-
 // Main TaskManager component
-export default function TaskManager() {
+export default function TaskManager({ initialModalOpen = false, onModalClose }: TaskManagerProps) {
+
+  // State management
   const [projects,       setProjects]       = useState<ProjectComponent[]>([]);
   const [isLoading,      setIsLoading]      = useState(true);
   const [filter,         setFilter]         = useState<'all' | TaskStatus>('all');  
   const [editingProject, setEditingProject] = useState<ProjectComponent | null>(null);
-  const [isModalOpen,    setIsModalOpen]    = useState(false);
+  const [isModalOpen,    setIsModalOpen]    = useState(initialModalOpen);
 
-  const projectRefs   = useRef<Map<string, HTMLElement>>(new Map());
-  const itemPositions = useRef<Map<string, ItemPosition>>(new Map());
-  const containerRef  = useRef<HTMLElement>(null);
+  // Refs management
+  const projectRefs = useRef<Map<string, HTMLElement>>(new Map());
+
+  // Sync modal state with parent
+  useEffect(() => {
+    setIsModalOpen(initialModalOpen);
+  }, [initialModalOpen]);
 
   // Load projects from localStorage on initial mount
   useEffect(() => {
@@ -74,55 +75,22 @@ export default function TaskManager() {
   // Filter projects based on task status
   const filteredProjects = useMemo(() => {
     if (filter === 'all') return projects;
-
     return projects.filter(project => 
       project.tasks.some(task => task.status === filter)
     );
   }, [projects, filter]);
 
-  // Update positions when Masonic renders
-  const handleMasonryRender = useCallback(() => {
-    requestAnimationFrame(() => {
-      itemPositions.current.clear();
-      
-      filteredProjects.forEach(project => {
-        const element = projectRefs.current.get(project.id);
-        if (element) {
-          const rect = element.getBoundingClientRect();
-          const containerRect = containerRef.current?.getBoundingClientRect();
-          const offsetX = containerRect ? rect.left - containerRect.left : rect.left;
-          const offsetY = containerRect ? rect.top - containerRect.top : rect.top;
-          
-          itemPositions.current.set(project.id, {
-            id: project.id,
-            x: offsetX,
-            y: offsetY,
-            width: rect.width,
-            height: rect.height
-          });
-        }
-      });
-    });
-  }, [filteredProjects]);
-
-  // Project operations
   const handleDelete = useCallback((projectId: string) => {
-    // Clean up refs
     projectRefs.current.delete(projectId);
-    itemPositions.current.delete(projectId);
-    
     setProjects(prev => {
       const newProjects = prev.filter(p => p.id !== projectId);
-      // Schedule a position update after the state change is complete
-      requestAnimationFrame(() => {
-        handleMasonryRender();
-      });
+      // Immediately update localStorage when projects are deleted
+      localStorage.setItem('projects', JSON.stringify(newProjects));
       return newProjects;
     });
-  }, [handleMasonryRender]);
+  }, []);
 
   const handleTaskUpdate = useCallback((projectId: string, newTasks: TaskComponent[]) => {
-    // Only update if tasks actually changed
     setProjects(prev => {
       const project = prev.find(p => p.id === projectId);
       if (!project || JSON.stringify(project.tasks) === JSON.stringify(newTasks)) {
@@ -144,6 +112,7 @@ export default function TaskManager() {
     
     setProjects(prev => [...prev, newProject]);
     setIsModalOpen(false);
+    onModalClose?.();
   };
 
   const handleEditProject = (projectData: Omit<ProjectComponent, 'id' | 'tasks'>) => {
@@ -161,112 +130,33 @@ export default function TaskManager() {
     
     setEditingProject(null);
     setIsModalOpen(false);
+    onModalClose?.();
   };
 
-  // Find closest item in given direction
-  const findClosestItem = useCallback((currentId: string, direction: 'up' | 'down' | 'left' | 'right'): string | null => {
-    const current = itemPositions.current.get(currentId);
-    if (!current) return null;
-
-    let closest: string | null = null;
-    let minDistance = Infinity;
-
-    const COLUMN_THRESHOLD = 50; // Pixels threshold for considering items in same column
-    const ROW_THRESHOLD = 50;    // Pixels threshold for considering items in same row
-
-    itemPositions.current.forEach((position, id) => {
-      if (id === currentId) return;
-
-      const isCorrectDirection = () => {
-        switch (direction) {
-          case 'up':
-            return position.y < current.y;
-          case 'down':
-            return position.y > current.y;
-          case 'left':
-            return position.x < current.x;
-          case 'right':
-            return position.x > current.x;
-        }
-      };
-
-      if (!isCorrectDirection()) return;
-
-      const horizontalDistance = Math.abs(position.x - current.x);
-      const verticalDistance = Math.abs(position.y - current.y);
-      
-      // For vertical movement, prioritize items in the same column
-      const distance = (direction === 'up' || direction === 'down')
-        ? (horizontalDistance <= COLUMN_THRESHOLD ? verticalDistance : Infinity)
-        : (verticalDistance <= ROW_THRESHOLD ? horizontalDistance : Infinity);
-
-      if (distance < minDistance) {
-        minDistance = distance;
-        closest = id;
-      }
-    });
-
-    return closest;
-  }, []);
-
   // Handle keyboard navigation within the projects grid
-  const handleProjectKeyDown = useCallback((e: React.KeyboardEvent, projectId: string) => {
-    let direction: 'up' | 'down' | 'left' | 'right' | null = null;
-
+  const handleProjectKeyDown = useCallback((e: React.KeyboardEvent) => {
     switch (e.key) {
-      case 'ArrowUp':
-        direction = 'up';
-        break;
-      case 'ArrowDown':
-        direction = 'down';
-        break;
-      case 'ArrowLeft':
-        direction = 'left';
-        break;
-      case 'ArrowRight':
-        direction = 'right';
-        break;
       case 'Home':
         if (e.ctrlKey && filteredProjects.length > 0) {
           e.preventDefault();
           projectRefs.current.get(filteredProjects[0].id)?.focus();
         }
-        return;
+        break;
       case 'End':
         if (e.ctrlKey && filteredProjects.length > 0) {
           e.preventDefault();
           projectRefs.current.get(filteredProjects[filteredProjects.length - 1].id)?.focus();
         }
-        return;
-      default:
-        return;
+        break;
     }
+  }, [filteredProjects]);
 
-    const nextItemId = findClosestItem(projectId, direction);
-    if (nextItemId) {
-      e.preventDefault();
-      projectRefs.current.get(nextItemId)?.focus();
-    }
-  }, [filteredProjects, findClosestItem]);
-
-  // Monitor container size changes
-  useEffect(() => {
-    if (!containerRef.current) return;
-    
-    const observer = new ResizeObserver(() => {
-      handleMasonryRender();
-    });
-    
-    observer.observe(containerRef.current);
-    return () => observer.disconnect();
-  }, [handleMasonryRender]);
-
-  // Render individual project for Masonry grid
-  const renderProject = useCallback(({ data: project}: { data: ProjectComponent, index: number }) => (
+  // Render individual project
+  const renderProject = useCallback((project: ProjectComponent) => (
     <Project
       ref={el => el && projectRefs.current.set(project.id, el)}
-      key={getStableKey(project)}
-      id={getStableKey(project)}
+      key={project.id}
+      id={project.id}
       project={project}
       onDelete={handleDelete}
       onEdit={(project) => {
@@ -275,78 +165,82 @@ export default function TaskManager() {
       }}
       onTaskUpdate={(newTasks) => handleTaskUpdate(project.id, newTasks)}
       filter={filter}
-      onKeyDown={(e) => handleProjectKeyDown(e, project.id)}
+      onKeyDown={handleProjectKeyDown}
     />
   ), [handleDelete, handleTaskUpdate, filter, handleProjectKeyDown]);
 
   return (
     <>
-      <Navigation onNewProject={() => setIsModalOpen(true)} />
+      <section className={styles.section}>
+        <h1 className={styles.title}>
+          Organize Your Projects,
+          <br/>
+          <span>Unlock Your Full Potential</span>
+        </h1>
 
-      <h1>
-        Organize Your Projects,
-        <br/>
-        <span>Unlock Your Full Potential</span>
-      </h1>
-
-      <Filter value={filter} onChange={setFilter} />
-
-      <section 
-        ref={containerRef}
-        className="projects-container" 
-        id="filtered-projects"
-        role="list"
-        aria-label="Projects"
-      >
+        {/* Loading Skeleton */}
         {isLoading ? (
-          <div aria-label="Loading projects" role="status">
+          <>
+            <FilterSkeleton />
             <Masonry
-              items={generateSkeletonItems(10)}
-              columnGutter={8}
-              columnWidth={300}
-              render={() => <ProjectSkeleton/>}
-              overscanBy={2}
-              maxColumnCount={4}
-              rowGutter={8}
+              items={[...Array(12)].map((_, i) => ({
+                id: `skeleton-${i}`,
+                name: '',
+                description: '',
+                tasks: []
+              }))}
+              gap={0.8}
+              render={(item) => <ProjectSkeleton key={item.id} />}
             />
-          </div>
-        ) : filteredProjects.length > 0 ? (
-          <Masonry
-            key={filteredProjects.map(p => p.id).join(',')}
-            items={filteredProjects}
-            columnGutter={8}
-            columnWidth={300}
-            render={renderProject}
-            overscanBy={2}
-            maxColumnCount={4}
-            itemHeightEstimate={200}
-            rowGutter={8}
-            onRender={handleMasonryRender}
-          />
+          </>
         ) : (
-          <div 
-            className="no-results"
-            role="status"
-            aria-live="polite"
-          >
-            <p>
-              {filter === 'all' 
-                ? "No projects found. Create your first project!"
-                : `No projects found with filter: ${filter}`
-              }
-            </p>
-            {filter === 'all' && (
-              <button 
-                className="create-project-button"
-                onClick={() => setIsModalOpen(true)}
-                aria-label="Create new project"
-                aria-haspopup="dialog"
-              >
-                <Plus aria-hidden="true" />
-                <span>New Project</span>
-              </button>
+          <>
+            {/* Only show filter if there are projects */}
+            {projects.length > 0 && (
+              <Filter value={filter} onChange={setFilter} />
             )}
-          </div>
+
+            {projects.length === 0 ? (
+              <div 
+                className={styles["no-projects"]}
+                role="button"
+                tabIndex={0}
+                onClick={() => setIsModalOpen(true)}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault();
+                    setIsModalOpen(true);
+                  }
+                }}
+                style={{ cursor: 'pointer' }}
+                aria-label="Create new project"
+              >
+                <p>Create your first project to get started!</p>
+                <Button
+                  icon={PlusCircle}
+                  theme="zinc"
+                  size="large"
+                  title="New Project"
+                  aria-hidden="true"
+                  tabIndex={-1}
+                />
+              </div>
+            ) : filteredProjects.length > 0 ? (
+              <Masonry
+                items={filteredProjects}
+                gap={0.8}
+                render={renderProject}
+              />
+            ) : (
+              <div 
+                className={styles["no-tasks"]}
+                role="status"
+                aria-live="polite"
+              >
+                <p>No tasks found with current filter: <strong>{filter.charAt(0).toUpperCase() + filter.slice(1)}</strong></p>
+              </div>
+            )}
+          </>
         )}
       </section>
 
@@ -357,6 +251,7 @@ export default function TaskManager() {
         onClose={() => {
           setIsModalOpen(false);
           setEditingProject(null);
+          onModalClose?.();
         }}
       >
         <ProjectForm
@@ -366,12 +261,8 @@ export default function TaskManager() {
           onCancel={() => {
             setIsModalOpen(false);
             setEditingProject(null);
+            onModalClose?.();
           }}
-          // Original task requires *name* to be unique and only allow 
-          // letters and numbers. But current application uses id as identifier
-          // and allows letters, numbers and dashes. If no id is provided,
-          // it will generate a random one.
-
           idValidation={{
             allowLetters: true,
             allowNumbers: true,

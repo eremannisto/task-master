@@ -1,0 +1,458 @@
+/* Theme: Red */
+.button[data-theme="red"] {
+  &[data-type="solid"] {
+    --background      : color-mix(in srgb, var(--color-red-600), var(--color-red-900) 50%);
+    --background-hover: color-mix(in srgb, var(--color-red-600), var(--color-red-800) 50%);
+    --text            : var(--color-red-50);
+    --text-hover      : var(--color-red-50);
+    --border          : transparent;
+    --border-hover    : transparent;
+
+    &:not([data-accent]) {
+      --accent          : var(--color-red-200);
+      --accent-hover    : var(--color-red-50);
+    }
+  }
+}
+
+/* Theme: Orange */
+.button[data-theme="orange"] {
+  &[data-type="solid"] {
+    --background      : color-mix(in srgb, var(--color-orange-600), var(--color-orange-900) 50%);
+    --background-hover: color-mix(in srgb, var(--color-orange-600), var(--color-orange-800) 50%);
+    --text            : var(--color-orange-50);
+    --text-hover      : var(--color-orange-100);
+    --border          : transparent;
+    --border-hover    : transparent;
+
+    &:not([data-accent]) {
+      --accent          : var(--color-orange-200);
+      --accent-hover    : var(--color-orange-50);
+    }
+  }
+}
+
+/* Theme: Amber */
+.button[data-theme="amber"] {
+  &[data-type="solid"] {
+    --background      : color-mix(in srgb, var(--color-amber-500), var(--color-amber-900) 50%);
+    --background-hover: color-mix(in srgb, var(--color-amber-500), var(--color-amber-800) 50%);
+    --text            : var(--color-amber-50);
+    --text-hover      : var(--color-amber-100);
+    --border          : transparent;
+    --border-hover    : transparent;
+
+    &:not([data-accent]) {
+      --accent          : var(--color-amber-100);
+      --accent-hover    : var(--color-amber-50);
+    }
+  }
+}
+
+/* Theme: Yellow */
+.button[data-theme="yellow"] {
+  &[data-type="solid"] {
+    --background      : color-mix(in srgb, var(--color-yellow-500), var(--color-yellow-800) 50%);
+    --background-hover: color-mix(in srgb, var(--color-yellow-500), var(--color-yellow-700) 50%);
+    --text            : var(--color-yellow-50);
+    --text-hover      : var(--color-yellow-100);
+    --border          : transparent;
+    --border-hover    : transparent;
+
+    &:not([data-accent]) {
+      --accent          : var(--color-yellow-100);
+      --accent-hover    : var(--color-yellow-50);
+    }
+  }
+}
+
+/* Theme: Lime */ 
+.button[data-theme="lime"] {
+  &[data-type="solid"] {
+    --background      : color-mix(in srgb, var(--color-lime-500), var(--color-lime-900) 50%);
+    --background-hover: color-mix(in srgb, var(--color-lime-500), var(--color-lime-800) 50%);
+    --text            : var(--color-lime-50);
+    --text-hover      : var(--color-lime-100);
+    --border          : transparent;
+    --border-hover    : transparent;
+
+    &:not([data-accent]) {
+      --accent          : var(--color-lime-100);
+      --accent-hover    : var(--color-lime-50);
+    }
+  }
+}
+
+/* Theme: Green */
+.button[data-theme="green"] {
+  &[data-type="solid"] {
+    --background      : color-mix(in srgb, var(--color-green-600), var(--color-green-900) 50%);
+    --background-hover: color-mix(in srgb, var(--color-green-600), var(--color-green-800) 50%);
+    --text            : var(--color-green-50);
+    --text-hover      : var(--color-green-100);
+    --border          : transparent;
+    --border-hover    : transparent;
+
+    &:not([data-accent]) {
+      --accent          : var(--color-green-100);
+      --accent-hover    : var(--color-green-50);
+    }
+  }
+}
+
+/* Theme: Emerald */
+.button[data-theme="emerald"] {
+  &[data-type="solid"] {
+    --background      : color-mix(in srgb, var(--color-emerald-600), var(--color-emerald-900) 50%);
+    --background-hover: color-mix(in srgb, var(--color-emerald-600), var(--color-emerald-800) 50%);
+    --text            : var(--color-emerald-50);
+    --text-hover      : var(--color-emerald-100);
+    --border          : transparent;
+    --border-hover    : transparent;
+
+    &:not([data-accent]) {
+      --accent          : var(--color-emerald-100);
+      --accent-hover    : var(--color-emerald-50);
+    }
+  }
+}
+
+/* Theme: Teal */
+.button[data-theme="teal"] {
+  &[data-type="solid"] {
+    --background      : color-mix(in srgb, var(--color-teal-500), var(--color-teal-900) 50%);
+    --background-hover: color-mix(in srgb, var(--color-teal-500), var(--color-teal-800) 50%);
+    --text            : var(--color-teal-50);
+    --text-hover      : var(--color-teal-100);
+    --border          : transparent;
+    --border-hover    : transparent;
+
+    &:not([data-accent]) {
+      --accent          : var(--color-teal-100);
+      --accent-hover    : var(--color-teal-50);
+    }
+  }
+}
+
+/* Theme: Cyan */
+.button[data-theme="cyan"] {
+  &[data-type="solid"] {
+    --background      : color-mix(in srgb, var(--color-cyan-500), var(--color-cyan-900) 50%);
+    --background-hover: color-mix(in srgb, var(--color-cyan-500), var(--color-cyan-800) 50%);
+    --text            : var(--color-cyan-50);
+    --text-hover      : var(--color-cyan-100);
+    --border          : transparent;
+    --border-hover    : transparent;
+
+    &:not([data-accent]) {
+      --accent          : var(--color-cyan-100);
+      --accent-hover    : var(--color-cyan-50);
+    }
+  }
+} 
+
+/* Theme: Sky */
+.button[data-theme="sky"] {
+  &[data-type="solid"] {
+    --background      : color-mix(in srgb, var(--color-sky-500), var(--color-sky-900) 50%);
+    --background-hover: color-mix(in srgb, var(--color-sky-500), var(--color-sky-800) 50%);
+    --text            : var(--color-sky-50);
+    --text-hover      : var(--color-sky-100);
+    --border          : transparent;
+    --border-hover    : transparent;
+
+    &:not([data-accent]) {
+      --accent          : var(--color-sky-100);
+      --accent-hover    : var(--color-sky-50);
+    }
+  }
+}
+
+/* Theme: Blue */
+.button[data-theme="blue"] {
+  &[data-type="solid"] {
+    --background      : color-mix(in srgb, var(--color-blue-500), var(--color-blue-900) 50%);
+    --background-hover: color-mix(in srgb, var(--color-blue-500), var(--color-blue-800) 50%);
+    --text            : var(--color-blue-50);
+    --text-hover      : var(--color-blue-100);
+    --border          : transparent;
+    --border-hover    : transparent;
+
+    &:not([data-accent]) {
+      --accent          : var(--color-blue-100);
+      --accent-hover    : var(--color-blue-50);
+    }
+  }
+}
+
+/* Theme: Indigo */
+.button[data-theme="indigo"] {
+  &[data-type="solid"] {
+    --background      : color-mix(in srgb, var(--color-indigo-500), var(--color-indigo-900) 50%);
+    --background-hover: color-mix(in srgb, var(--color-indigo-500), var(--color-indigo-800) 50%);
+    --text            : var(--color-indigo-50);
+    --text-hover      : var(--color-indigo-100);
+    --border          : transparent;
+    --border-hover    : transparent;
+
+    &:not([data-accent]) {
+      --accent          : var(--color-indigo-100);
+      --accent-hover    : var(--color-indigo-50);
+    }
+  }
+}
+
+/* Theme: Violet */
+.button[data-theme="violet"] {
+  &[data-type="solid"] {
+    --background      : color-mix(in srgb, var(--color-violet-500), var(--color-violet-900) 50%);
+    --background-hover: color-mix(in srgb, var(--color-violet-500), var(--color-violet-800) 50%);
+    --text            : var(--color-violet-50);
+    --text-hover      : var(--color-violet-100);
+    --border          : transparent;
+    --border-hover    : transparent;
+
+    &:not([data-accent]) {
+      --accent          : var(--color-violet-100);
+      --accent-hover    : var(--color-violet-50);
+    }
+  }
+} 
+
+/* Theme: Purple */
+.button[data-theme="purple"] {
+  &[data-type="solid"] {
+    --background      : color-mix(in srgb, var(--color-purple-500), var(--color-purple-900) 50%);
+    --background-hover: color-mix(in srgb, var(--color-purple-500), var(--color-purple-800) 50%);
+    --text            : var(--color-purple-50);
+    --text-hover      : var(--color-purple-100);
+    --border          : transparent;
+    --border-hover    : transparent;
+
+    &:not([data-accent]) {
+      --accent          : var(--color-purple-100);
+      --accent-hover    : var(--color-purple-50);
+    }
+  }
+}
+
+/* Theme: Fuchsia */
+.button[data-theme="fuchsia"] {
+  &[data-type="solid"] {
+    --background      : color-mix(in srgb, var(--color-fuchsia-500), var(--color-fuchsia-900) 50%);
+    --background-hover: color-mix(in srgb, var(--color-fuchsia-500), var(--color-fuchsia-800) 50%);
+    --text            : var(--color-fuchsia-50);
+    --text-hover      : var(--color-fuchsia-100);
+    --border          : transparent;
+    --border-hover    : transparent;
+
+    &:not([data-accent]) {
+      --accent          : var(--color-fuchsia-100);
+      --accent-hover    : var(--color-fuchsia-50);
+    }
+  }
+}
+
+/* Theme: Pink */
+.button[data-theme="pink"] {
+  &[data-type="solid"] {
+    --background      : color-mix(in srgb, var(--color-pink-500), var(--color-pink-900) 50%);
+    --background-hover: color-mix(in srgb, var(--color-pink-500), var(--color-pink-800) 50%);
+    --text            : var(--color-pink-50);
+    --text-hover      : var(--color-pink-100);
+    --border          : transparent;
+    --border-hover    : transparent;
+
+    &:not([data-accent]) {
+      --accent          : var(--color-pink-100);
+      --accent-hover    : var(--color-pink-50);
+    }
+  }
+}
+
+/* Theme: Rose */
+.button[data-theme="rose"] {
+  &[data-type="solid"] {
+    --background      : color-mix(in srgb, var(--color-rose-500), var(--color-rose-900) 50%);
+    --background-hover: color-mix(in srgb, var(--color-rose-500), var(--color-rose-800) 50%);
+    --text            : var(--color-rose-50);
+    --text-hover      : var(--color-rose-100);
+    --border          : transparent;
+    --border-hover    : transparent;
+  }
+} 
+
+/* Theme: Stone */
+.button[data-theme="stone"] {
+  &[data-type="solid"] {
+    --background      : color-mix(in srgb, var(--color-stone-500), var(--color-stone-900) 50%);
+    --background-hover: color-mix(in srgb, var(--color-stone-500), var(--color-stone-800) 50%);
+    --text            : var(--color-stone-50);
+    --text-hover      : var(--color-stone-100);
+    --border          : transparent;
+    --border-hover    : transparent;
+  }
+}
+
+/* Theme: Zinc */
+.button[data-theme="zinc"] {  
+  &[data-type="solid"] {
+    --background      : color-mix(in srgb, var(--color-zinc-700), var(--color-zinc-950) 45%);
+    --background-hover: color-mix(in srgb, var(--color-zinc-700), var(--color-zinc-900) 45%);
+    --text            : var(--color-zinc-50);
+    --text-hover      : var(--color-zinc-100);
+    --border          : transparent;
+    --border-hover    : transparent;
+
+    &:not([data-accent]) {
+      --accent          : var(--color-zinc-400);
+      --accent-hover    : var(--color-zinc-200);
+    }
+  }
+}
+
+/* Theme: Neutral */
+.button[data-theme="neutral"] {
+  &[data-type="solid"] {
+    --background      : color-mix(in srgb, var(--color-neutral-500), var(--color-neutral-900) 50%);
+    --background-hover: color-mix(in srgb, var(--color-neutral-500), var(--color-neutral-800) 50%);
+    --text            : var(--color-neutral-50);
+    --text-hover      : var(--color-neutral-100);
+    --border          : transparent;
+    --border-hover    : transparent;
+  }
+
+  &:not([data-accent]) {
+    --accent          : var(--color-neutral-100);
+    --accent-hover    : var(--color-neutral-50);
+  }
+}
+
+/* Theme: Gray */
+.button[data-theme="gray"] {
+  &[data-type="solid"] {
+    --background      : color-mix(in srgb, var(--color-gray-500), var(--color-gray-900) 50%);
+    --background-hover: color-mix(in srgb, var(--color-gray-500), var(--color-gray-800) 50%);
+    --text            : var(--color-gray-50);
+    --text-hover      : var(--color-gray-100);
+    --border          : transparent;
+    --border-hover    : transparent;
+  }
+
+  &:not([data-accent]) {
+    --accent          : var(--color-gray-100);
+    --accent-hover    : var(--color-gray-50);
+  }
+}
+
+/* Theme: Slate */
+.button[data-theme="slate"] {
+  &[data-type="solid"] {
+    --background      : color-mix(in srgb, var(--color-slate-500), var(--color-slate-900) 50%);
+    --background-hover: color-mix(in srgb, var(--color-slate-500), var(--color-slate-800) 50%);
+    --text            : var(--color-slate-50);
+    --text-hover      : var(--color-slate-100);
+    --border          : transparent;
+    --border-hover    : transparent;
+
+    &:not([data-accent]) {
+      --accent          : var(--color-slate-100);
+      --accent-hover    : var(--color-slate-50);
+    }
+  }
+}
+
+.button {
+  position        : relative;
+  display         : inline-flex;
+  align-items     : center;
+  justify-content : center;
+  border-radius   : 0.8rem;
+  font-weight     : 500;
+  cursor          : pointer;
+  white-space     : nowrap;
+  transition      : all 200ms ease;
+  border          : 1.5px solid var(--border);
+  background      : var(--background);
+  color           : var(--text);
+
+  /* Button size: Small */
+  &[data-size="small"] {
+    padding       : 0.8rem 1.2rem;
+    font-size     : 1.2rem;
+    gap           : 0.4rem;
+    border-radius : 0.8rem;
+    
+    .icon {
+      width : 1.6rem;
+      height: 1.6rem;
+    }
+  }
+
+  /* Button size: Medium */
+  &[data-size="medium"] {
+    padding       : 0.8rem 1.2rem;
+    font-size     : 1.4rem;
+    gap           : 0.6rem;
+    border-radius : 1rem;
+
+    .icon {
+      width : 1.8rem;
+      height: 1.8rem;
+    }
+  }
+
+  /* Button size: Large */
+  &[data-size="large"] {
+    padding       : 1.2rem 1.6rem;
+    font-size     : 1.6rem;
+    gap           : 0.8rem;
+    border-radius : 1.2rem;
+
+    .icon {
+      width : 2rem;
+      height: 2rem;
+    }
+  }
+
+  /* Icon */
+  .icon {
+    flex-shrink: 0;
+    color      : var(--accent);
+  }
+
+  /* Button hover */
+  &:hover {
+    background-color  : var(--background-hover);
+    border-color      : var(--border-hover);
+    color             : var(--text-hover);
+
+    .icon {
+      color: var(--accent-hover);
+    }
+  }
+
+  /* Button states */
+  &:disabled {
+    opacity : 50%;
+    cursor  : not-allowed;
+  }
+
+  /* Hide title */
+  &[data-hide-title="true"] {
+    @media (max-width: 480px) {
+      .title {
+        display: none;
+      }
+    }
+  }
+
+  /* Hide icon */
+  &[data-hide-icon="true"] {
+    @media (max-width: 480px) {
+      .icon {
+        display: none;
+      }
+    }
+  }
+}

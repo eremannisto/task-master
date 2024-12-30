@@ -1,6 +1,7 @@
 import { useCallback, useRef }        from 'react'
 import { CirclePlus, DatabaseBackup } from 'lucide-react'
 import { mockProjects }               from '@data'
+import { Button }                     from '@components/Button/Button.component.tsx'
 
 import styles from './Navigation.module.css'
 import logo   from '@assets/logo-alt.png'
@@ -84,28 +85,31 @@ export default function Navigation({ onNewProject }: NavigationProps) {
           <div 
             className  = {styles.actions}
             role       = "group"
-            aria-label = "Project actions"
+            aria-label = "Navigation options"
           >
-            <button 
-              ref={el => buttonsRef.current[0] = el}
-              className={styles.action}
-              onClick={loadMockData}
-              onKeyDown={e => handleKeyDown(e, 0)}
-              aria-label={actionDescriptions.mockData}
-            >
-              <DatabaseBackup aria-hidden="true" />
-              <span>Mockup Data</span>
-            </button>
-            <button 
+            <Button
               ref={el => buttonsRef.current[1] = el}
-              className={styles.action}
-              onClick={onNewProject}
+              icon={DatabaseBackup}
+              theme="zinc"
+              size="medium"
+              title="Mockup Data"
+              description={actionDescriptions.mockData}
+              hideTitle={true}
+              onClick={loadMockData}
               onKeyDown={e => handleKeyDown(e, 1)}
-              aria-label={actionDescriptions.newProject}
-            >
-              <CirclePlus aria-hidden="true" />
-              <span>New Project</span>
-            </button>
+            />
+
+            <Button
+              ref={el => buttonsRef.current[2] = el}
+              icon={CirclePlus}
+              theme="emerald"
+              size="medium"
+              title="New Project"
+              description={actionDescriptions.newProject}
+              hideTitle={true}
+              onClick={onNewProject}
+              onKeyDown={e => handleKeyDown(e, 2)}
+            />
           </div>
         </div>
       </nav>

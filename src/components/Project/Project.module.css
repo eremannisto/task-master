@@ -420,8 +420,6 @@
 }
 
 .projectSkeleton {
-  position: relative;
-  width: 100%;
   background: var(--color-zinc-900);
   border: 1px solid var(--color-zinc-800);
   border-radius: 8px;
@@ -432,8 +430,9 @@
   padding-top: 2.8rem;
   transition: height 0.2s ease-out;
   height: auto;
-  min-height: 100px;
+  min-height: 10rem;
   z-index: 2;
+  position: relative;
 }
 
 .projectSkeleton .header {

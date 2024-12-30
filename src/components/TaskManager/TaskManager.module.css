@@ -1,0 +1,53 @@
+/* src/components/TaskManager/TaskManager.css */
+.section {
+  display       : flex;
+  flex-direction: column;
+  align-items   : center;
+  width         : 100%;
+  gap           : var(--space-200);
+  padding-top   : 10dvh;
+  padding-bottom: 5dvh;
+
+
+  h1 {
+    font-size   : var(--fs-fluid-xxl);
+    text-align  : center;
+    line-height : 1;
+    color       : var(--color-zinc-500);
+    font-weight : 700;
+    margin-bottom: var(--space-600);
+
+    span {
+      color: var(--color-zinc-200);
+    }
+  }
+
+  .no-projects {
+    display       : flex;
+    flex-direction: column;
+    align-items   : center;
+    gap           : var(--space-300);
+    padding       : var(--space-600);
+    text-align    : center;
+    color         : var(--color-zinc-400);
+    font-size     : var(--fs-fluid-base);
+    font-weight   : 600;
+    width         : 100%;
+    border        : 3px dashed var(--color-zinc-500);
+    border-radius : 12px;
+    background    : var(--color-zinc-900);
+    max-width     : 70rem;
+  }
+
+  .no-tasks {
+    display       : flex;
+    flex-direction: column;
+    align-items   : center;
+    gap           : var(--space-300);
+    padding       : var(--space-200);
+    text-align    : center;
+    font-size     : var(--fs-fluid-base);
+    color         : var(--color-zinc-400);
+    font-weight   : 400;
+  }
+}

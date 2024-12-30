@@ -1,0 +1,17 @@
+.masonry {
+  display: flex;
+  gap: var(--gap, 0.8rem);
+  width: 100%;
+  margin: 0 auto;
+}
+
+.column {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: var(--gap, 0.8rem);
+}
+
+.item {
+  width: 100%;
+} 

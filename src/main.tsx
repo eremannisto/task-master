@@ -1,4 +1,4 @@
-import { StrictMode } from 'react'
+import { StrictMode, useState } from 'react'
 import { createRoot } from 'react-dom/client'
 
 import '@styles/reset.css'
@@ -10,12 +10,18 @@ import Navigation  from '@components/Navigation/Navigation.tsx'
 import TaskManager from '@components/TaskManager/TaskManager.tsx'
 import Background  from '@components/Background/Background.tsx'
 
-createRoot(document.getElementById('root')!).render(
-  <StrictMode>
-    <Navigation onNewProject={() => {}} />
-    <main>
-      <TaskManager />
-    </main>
-    <Background />
-  </StrictMode>,
-)
+function App() {
+  const [isModalOpen, setIsModalOpen] = useState(false);
+
+  return (
+    <StrictMode>
+      <Navigation onNewProject={() => setIsModalOpen(true)} />
+      <main>
+        <TaskManager initialModalOpen={isModalOpen} onModalClose={() => setIsModalOpen(false)} />
+      </main>
+      <Background />
+    </StrictMode>
+  );
+}
+
+createRoot(document.getElementById('root')!).render(<App />);

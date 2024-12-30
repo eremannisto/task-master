@@ -88,7 +88,7 @@ const ProjectBase = forwardRef<HTMLElement, ProjectProps>(({
     );
   };
 
-  const handleTaskStatusChange = (taskId: string) => {
+  const handleTaskStatusChange = (taskId: string, button?: HTMLElement) => {
     handleTaskUpdate((currentTasks) => 
       currentTasks.map(task => {
         if (task.id === taskId) {
@@ -100,6 +100,12 @@ const ProjectBase = forwardRef<HTMLElement, ProjectProps>(({
         return task;
       })
     );
+    // Maintain focus on the button after status change
+    if (button) {
+      requestAnimationFrame(() => {
+        button.focus();
+      });
+    }
   };
 
   const handleTaskEdit = (taskId: string, description: string) => {
@@ -140,7 +146,7 @@ const ProjectBase = forwardRef<HTMLElement, ProjectProps>(({
   const handleTaskKeyDown = (e: React.KeyboardEvent, taskId: string) => {
     if (e.key === 'Enter' || e.key === ' ') {
       e.preventDefault();
-      handleTaskStatusChange(taskId);
+      handleTaskStatusChange(taskId, e.currentTarget as HTMLElement);
     }
   };
 
@@ -185,7 +191,7 @@ const ProjectBase = forwardRef<HTMLElement, ProjectProps>(({
             <button
               data-action="status"
               className={styles.statusButton}
-              onClick={() => handleTaskStatusChange(task.id)}
+              onClick={(e) => handleTaskStatusChange(task.id, e.currentTarget)}
               onKeyDown={(e) => handleTaskKeyDown(e, task.id)}
               aria-label={`Change status of task: ${task.description}. Current status: ${task.status}`}
               role="switch"

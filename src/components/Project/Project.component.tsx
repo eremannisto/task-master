@@ -1,30 +1,20 @@
 import { useState, useRef, useEffect, useCallback, useMemo, memo, forwardRef } from 'react';
-import { CircleDashed, CircleDot, CircleCheck, Trash, Plus, X, SquarePen, EyeOff } from 'lucide-react';
-import { TaskComponent, ProjectComponent, TaskStatus } from '@types';
-import { Modal } from '@/components/Modal/Modal.component';
-import { generateId } from '@utils/generateId';
-import { Form } from '@components/Form/Form.component';
-import { Button } from '@components/Button/Button.component';
-import styles from './Project.module.css';
+import { CircleDashed, CircleDot, CircleCheck, Trash, Plus, X, PencilLine, EyeOff } from 'lucide-react';
+import type { ProjectProps, ProjectFormProps, ValidationOptions, TaskComponent} from './Project.types';
 
-interface ProjectProps {
-  id?: string;
-  project: ProjectComponent;
-  onDelete: (id: string) => void;
-  onEdit?: (project: ProjectComponent) => void;
-  onTaskUpdate: (tasks: TaskComponent[]) => void;
-  filter: 'all' | TaskStatus;
-  onKeyDown?: (e: React.KeyboardEvent) => void;
-}
+import { Modal }      from '@/components/Modal/Modal.component';
+import { generateId } from '@utils/generateId';
+import { Form }       from '@components/Form/Form.component';
+import { Button }     from '@components/Button/Button.component';
+import styles         from './Project.module.css';
 
 /**
  * Project component
- * @param project      : ProjectComponent
- * @param onDelete     : (id: string) => void
- * @param onEdit       : (project: ProjectComponent) => void
- * @param onTaskUpdate : (tasks: TaskComponent[]) => void
- * @param filter       : 'all' | TaskStatus
- * @returns 
+ * - Displays and manages a project and its tasks
+ * - Supports task creation, editing, deletion
+ * - Implements task status management
+ * - Provides keyboard navigation and accessibility
+ * - Handles task filtering by status
  */
 const ProjectBase = forwardRef<HTMLElement, ProjectProps>(({ 
   id,
@@ -36,25 +26,42 @@ const ProjectBase = forwardRef<HTMLElement, ProjectProps>(({
   onKeyDown
 }, ref) => {
 
-  // Task state
+  /**
+   * Component state
+   * - tasks: Current tasks in the project
+   * - newTaskText: Text for new task being created
+   * - editingTaskId: ID of task currently being edited
+   * - editingText: Current text while editing a task
+   * - showDeleteConfirm: Controls delete confirmation modal
+   */
   const [ tasks,             setTasks             ] = useState(initialProject?.tasks || []);
   const [ newTaskText,       setNewTaskText       ] = useState('');
   const [ editingTaskId,     setEditingTaskId     ] = useState<string | null>(null);
   const [ editingText,       setEditingText       ] = useState('');
   const [ showDeleteConfirm, setShowDeleteConfirm ] = useState(false);
 
-  // Refs for managing textarea heights
-  const textareaRefs = useRef<Map<string, HTMLTextAreaElement>>(new Map());
+  /**
+   * Refs for managing textarea elements
+   * - textareaRefs: Map of task IDs to textarea elements
+   * - newTaskTextareaRef: Ref for new task input
+   */
+  const textareaRefs       = useRef<Map<string, HTMLTextAreaElement>>(new Map());
   const newTaskTextareaRef = useRef<HTMLTextAreaElement>(null);
 
-  // Sync tasks with parent when they change
+  /**
+   * Sync tasks with parent component
+   * Updates local task state when project tasks change
+   */
   useEffect(() => {
     if (initialProject?.tasks) {
       setTasks(initialProject.tasks);
     }
   }, [initialProject?.tasks]);
 
-  // Adjust textarea heights when tasks change
+  /**
+   * Textarea height management
+   * Adjusts heights of all task textareas when tasks change
+   */
   useEffect(() => {
     initialProject.tasks.forEach(task => {
       const textarea = textareaRefs.current.get(task.id);
@@ -68,7 +75,11 @@ const ProjectBase = forwardRef<HTMLElement, ProjectProps>(({
     }
   }, [initialProject.tasks]);
 
-  // Filter visible tasks based on status
+  /**
+   * Task filtering
+   * - Filters tasks based on current filter status
+   * - Memoized to prevent unnecessary recalculations
+   */
   const visibleTasks = useMemo(() => {
     if (!tasks?.length) return [];
     return filter === 'all' 
@@ -78,19 +89,35 @@ const ProjectBase = forwardRef<HTMLElement, ProjectProps>(({
 
   const hiddenTasks = tasks.length - visibleTasks.length;
 
-  // Task operations
+  /**
+   * Task operations
+   * - handleTaskUpdate: Generic task update function
+   * - handleTaskDelete: Removes a task
+   * - handleTaskStatusChange: Cycles task status
+   * - handleTaskEdit: Updates task description
+   * - handleAddTask: Creates a new task
+   */
   const handleTaskUpdate = (updateFn: (tasks: TaskComponent[]) => TaskComponent[]) => {
     const newTasks = updateFn(tasks);
     setTasks(newTasks);
     onTaskUpdate(newTasks);
   };
 
+  /**
+   * Handle task deletion
+   * - Removes a task from the project
+   */
   const handleTaskDelete = (taskId: string) => {
     handleTaskUpdate((currentTasks) => 
       currentTasks.filter(task => task.id !== taskId)
     );
   };
 
+  /**
+   * Handle task status change
+   * - Cycles task status between todo, doing, and done
+   * - Maintains focus on the button after status change
+   */
   const handleTaskStatusChange = (taskId: string, button?: HTMLElement) => {
     handleTaskUpdate((currentTasks) => 
       currentTasks.map(task => {
@@ -111,6 +138,11 @@ const ProjectBase = forwardRef<HTMLElement, ProjectProps>(({
     }
   };
 
+  /**
+   * Edit a task description
+   * - Updates the task description if it's not empty
+   * - Deletes the task if the new description is empty
+   */
   const handleTaskEdit = (taskId: string, description: string) => {
     if (!description.trim()) {
       handleTaskDelete(taskId);
@@ -123,6 +155,11 @@ const ProjectBase = forwardRef<HTMLElement, ProjectProps>(({
     }
   };
 
+  /**
+   * Add a new task to the project
+   * - Generates a new task ID
+   * - Adds the new task to the project
+   */
   const handleAddTask = (description: string) => {
     const newTask = {
       id: `${initialProject.id}-${initialProject.tasks.length + 1}`,
@@ -132,12 +169,20 @@ const ProjectBase = forwardRef<HTMLElement, ProjectProps>(({
     handleTaskUpdate((currentTasks) => [...currentTasks, newTask]);
   };
 
-  // UI helpers
+  /**
+   * UI helpers
+   * - adjustTextareaHeight: Dynamically adjusts textarea height
+   * - getTaskIcon: Returns appropriate icon for task status
+   */
   const adjustTextareaHeight = (element: HTMLTextAreaElement) => {
     element.style.height = 'auto';
     element.style.height = `${element.scrollHeight}px`;
   };
 
+  /**
+   * Get task icon
+   * - Returns an icon based on the task status
+   */
   const getTaskIcon = (status: TaskComponent['status']) => {
     switch (status) {
       case 'todo'  : return <CircleDashed className="task-icon" aria-hidden="true" />;
@@ -146,6 +191,11 @@ const ProjectBase = forwardRef<HTMLElement, ProjectProps>(({
     }
   };
 
+  /**
+   * Event handlers
+   * - handleTaskKeyDown: Keyboard navigation for tasks
+   * - handleConfirmDelete: Project deletion confirmation
+   */
   const handleTaskKeyDown = (e: React.KeyboardEvent, taskId: string) => {
     if (e.key === 'Enter' || e.key === ' ') {
       e.preventDefault();
@@ -153,6 +203,10 @@ const ProjectBase = forwardRef<HTMLElement, ProjectProps>(({
     }
   };
 
+  /**
+   * Handle project deletion
+   * - Deletes the project and closes the delete confirmation modal
+   */
   const handleConfirmDelete = useCallback(() => {
     onDelete(initialProject.id);
     setShowDeleteConfirm(false);
@@ -164,10 +218,13 @@ const ProjectBase = forwardRef<HTMLElement, ProjectProps>(({
       id={id}
       className={styles.project}
       tabIndex={0}
-      aria-label={`Project: ${initialProject.name}`}
+      aria-label={`Project: ${initialProject.name}. Contains ${tasks.length} tasks.`}
       onKeyDown={onKeyDown}
     >
-      {/* Project Header */}
+      {/* Project Header Section
+          - Displays project name and description
+          - Provides context for screen readers
+      */}
       <header>
         <div className={styles.details}>
           <h2 className={styles.title}>{initialProject.name}</h2>
@@ -175,11 +232,15 @@ const ProjectBase = forwardRef<HTMLElement, ProjectProps>(({
         </div>
       </header>
 
-      {/* Task List */}
+      {/* Task List Section
+          - Contains all tasks for the project
+          - Supports filtering by task status
+          - Provides keyboard navigation
+      */}
       <div 
         className={styles.tasks} 
         role="group"
-        aria-label={`Tasks for ${initialProject.name}`}
+        aria-label={`Tasks for project ${initialProject.name}. ${tasks.length} total tasks.`}
       >
         {visibleTasks.map((task) => (
           <div 
@@ -187,9 +248,13 @@ const ProjectBase = forwardRef<HTMLElement, ProjectProps>(({
             className={styles.task} 
             data-status={task.status}
             role="group"
-            aria-label={`Task: ${task.description}`}
+            aria-label={`Task with status ${task.status}: ${task.description}`}
           >
-            {/* Task Status Toggle */}
+            {/* Task Status Toggle Button
+                - Cycles through todo -> doing -> done
+                - Provides visual and screen reader feedback
+                - Supports keyboard interaction
+            */}
             <button
               data-action="status"
               className={styles.statusButton}
@@ -207,7 +272,12 @@ const ProjectBase = forwardRef<HTMLElement, ProjectProps>(({
               </span>
             </button>
 
-            {/* Task Description */}
+            {/* Task Description Textarea
+                - Auto-resizing input field
+                - Supports markdown editing
+                - Handles empty state deletion
+                - Provides keyboard shortcuts
+            */}
             <textarea
               ref={(el) => {
                 if (el) textareaRefs.current.set(task.id, el);
@@ -256,19 +326,27 @@ const ProjectBase = forwardRef<HTMLElement, ProjectProps>(({
               }}
             />
 
-            {/* Task Delete Button */}
+            {/* Task Delete Button
+                - Removes task from project
+                - Provides confirmation via aria-label
+                - Maintains focus management
+            */}
             <button
               data-action="delete"
               className={styles.deleteButton}
               onClick={() => handleTaskDelete(task.id)}
-              aria-label={`Delete task: ${task.description}`}
+              aria-label={`Delete task with description: ${task.description}`}
             >
               <X className={styles.icon} aria-hidden="true" />
             </button>
           </div>
         ))}
 
-        {/* Hidden Tasks Indicator */}
+        {/* Hidden Tasks Indicator
+            - Shows count of filtered tasks
+            - Updates via aria-live for screen readers
+            - Provides visual feedback
+        */}
         {hiddenTasks > 0 && (
           <div 
             className={`${styles.task} ${styles["hidden-tasks"]}`}
@@ -281,21 +359,26 @@ const ProjectBase = forwardRef<HTMLElement, ProjectProps>(({
               </span>
             </div>
             <span className={styles.description}>
-              {hiddenTasks} task{hiddenTasks !== 1 ? 's' : ''} hidden by filter
+              {hiddenTasks} task{hiddenTasks !== 1 ? 's' : ''} hidden by current filter
             </span>
           </div>
         )}
 
-        {/* New Task Input */}
+        {/* New Task Input Section
+            - Allows quick task creation
+            - Auto-focuses on activation
+            - Supports keyboard shortcuts
+            - Provides clear accessibility labels
+        */}
         <div 
           className={`${styles.task} ${styles["new-task"]}`}
           role="group"
-          aria-label="Add new task"
+          aria-label="Add a new task to this project"
         >
           <button
             data-action="status"
             className={styles.statusButton}
-            aria-label="New task status"
+            aria-label="New task will start with todo status"
             disabled
           >
             <Plus className={styles.icon} aria-hidden="true" />
@@ -330,7 +413,7 @@ const ProjectBase = forwardRef<HTMLElement, ProjectProps>(({
             }}
             placeholder="Add new task..."
             rows={1}
-            aria-label="Enter new task description"
+            aria-label="Enter description for new task. Press Enter to add."
             style={{
               resize: 'none',
               overflow: 'hidden',
@@ -341,29 +424,40 @@ const ProjectBase = forwardRef<HTMLElement, ProjectProps>(({
         </div>
       </div>
 
-      {/* Project Actions */}
+      {/* Project Actions Section
+          - Edit and delete project buttons
+          - Provides confirmation dialogs
+          - Maintains keyboard accessibility
+      */}
       <footer className={styles.actions}>
-        <Button 
-          icon={SquarePen}
+        <Button
+          icon={PencilLine}
           title="Edit"
           theme="zinc"
           variant="solid"
           onClick={() => onEdit?.(initialProject)}
           aria-haspopup="true"
+          aria-label={`Edit project ${initialProject.name}`}
           className={`${styles["project-action"]} ${styles["project-edit"]}`}
         />
-        <Button 
+        <Button
           icon={Trash}
           title="Delete"
           theme="red"
           variant="solid"
           onClick={() => setShowDeleteConfirm(true)}
           aria-haspopup="true"
+          aria-label={`Delete project ${initialProject.name}`}
           className={`${styles["project-action"]} ${styles["project-delete"]}`}
         />
       </footer>
 
-      {/* Delete Confirmation Modal */}
+      {/* Delete Confirmation Modal
+          - Prevents accidental deletion
+          - Provides clear warning message
+          - Maintains focus trap
+          - Supports keyboard interaction
+      */}
       {showDeleteConfirm && (
         <Modal
           title="Delete Project"
@@ -397,6 +491,12 @@ const ProjectBase = forwardRef<HTMLElement, ProjectProps>(({
   );
 });
 
+/**
+ * Memoized Project component
+ * - Optimizes rendering by comparing props
+ * - Uses shallow comparison for tasks array
+ * - Returns true if props are unchanged
+ */
 export const Project = memo(ProjectBase, (prevProps: ProjectProps, nextProps: ProjectProps) => {
   return (
     prevProps.project.id === nextProps.project.id &&
@@ -405,25 +505,26 @@ export const Project = memo(ProjectBase, (prevProps: ProjectProps, nextProps: Pr
   );
 });
 
-
-// Project Form
-// Validation types and utilities
-interface ValidationOptions {
-  allowLetters    : boolean;     // Allow a-z, A-Z
-  allowNumbers    : boolean;     // Allow 0-9
-  allowCharacters : string[];    // Array of allowed special characters
-  minimumLength   : number;      // Minimum length
-  maximumLength   : number;      // Maximum length
-}
-
-const DEFAULT_VALIDATION: ValidationOptions = {
+/**
+ * Default validation options for project ID
+ * - Allow letters, numbers, and dashes
+ * - Minimum length of 3 characters
+ * - Maximum length of 60 characters
+ */
+export const DEFAULT_VALIDATION: ValidationOptions = {
   allowLetters    : true,
   allowNumbers    : true,
   allowCharacters : ['-'],  // Only allow dashes as special characters
   minimumLength   : 3,
   maximumLength   : 60
-};
+}; 
 
+/**
+ * Validate project ID
+ * - Checks if the ID is empty or within the allowed length
+ * - Validates the characters in the ID
+ * - Returns an error message if the ID is invalid
+ */
 const validateId = (value: string, options: ValidationOptions = DEFAULT_VALIDATION): string | null => {
   if (!value) return null; // Allow empty for auto-generation
   
@@ -446,14 +547,13 @@ const validateId = (value: string, options: ValidationOptions = DEFAULT_VALIDATI
   return null;
 };
 
-interface ProjectFormProps {
-  project?: ProjectComponent;
-  onSubmit: (data: Omit<ProjectComponent, 'tasks'>) => void;
-  onCancel: () => void;
-  idValidation?: ValidationOptions;
-  existingIds?: string[]; // Add this to check for uniqueness
-}
-
+/**
+ * Project form component
+ * - Manages project creation and editing
+ * - Validates project ID and name
+ * - Handles form submission and cancellation
+ * - Provides a form interface for project details
+ */
 export const ProjectForm = ({ 
   project, 
   onSubmit, 

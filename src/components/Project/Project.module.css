@@ -248,6 +248,10 @@
   gap: 0.4rem;
   justify-content: flex-end;
   
+  button {
+    width: 100%;
+  }
+
   .action {
     background: color-mix(in srgb, var(--color-zinc-400), transparent 90%);
     border: none;

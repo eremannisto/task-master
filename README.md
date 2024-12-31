@@ -10,11 +10,19 @@ npm install
 
 # Run the development server
 npm run dev
+
+# Build the application
+npm run build
+
+# Preview the build
+npm run preview
 ```
 
 ## Features
 - Create and manage task lists
 - Maintain a strong focus on accessibility
-- Work offline and meet WCAG 2.2 AA standards
+- Work offline and aims to meet WCAG 2.2 AA standards
 - Responsive design
 - Offline first
+- Keyboard navigation
+- Masonry layout

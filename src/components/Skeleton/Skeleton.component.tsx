@@ -1,11 +1,17 @@
-import { CSSProperties }     from 'react';
-import { SkeletonComponent } from '@types';
-import styles from './Skeleton.module.css';
+import { CSSProperties }          from 'react';
+import type { SkeletonComponent } from './Skeleton.types';
+import styles                     from './Skeleton.module.css';
 
+/**
+ * Skeleton component
+ * - Displays a loading placeholder
+ * - Customizable width, height, and border radius
+ * - Optional additional CSS class name
+ */
 export const Skeleton = ({ 
-  width     = '100%', 
-  height    = '2rem',
-  radius    = '0.4rem',
+  width  = '100%', 
+  height = '2rem',
+  radius = '0.4rem',
 }: SkeletonComponent) => {
   const style: CSSProperties = {
     width        : typeof width  === 'number' ? `${width}px`  : width,

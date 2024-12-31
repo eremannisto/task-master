@@ -3,13 +3,23 @@ import { type TaskStatus, FilterValue }         from '@types';
 import { CircleDashed, CircleDot, CircleCheck } from 'lucide-react';
 import styles                                   from './Filter.module.css';
 
+/**
+ * Icon mapping for task statuses
+ * - todo: Empty circle
+ * - doing: Circle with dot
+ * - done: Circle with check
+ */
 const icons: Record<TaskStatus, React.ReactNode> = {
   todo : <CircleDashed className={styles.icon} aria-hidden="true" />,
   doing: <CircleDot    className={styles.icon} aria-hidden="true" />,
   done : <CircleCheck  className={styles.icon} aria-hidden="true" />,
 };
 
-// Descriptive text for screen readers
+/**
+ * Descriptive text for screen readers
+ * - Provides clear context for each filter option
+ * - Used in aria-label attributes
+ */
 const filterDescriptions: Record<FilterValue, string> = {
   all:   'Show all tasks regardless of status',
   todo:  'Show only tasks that need to be started',
@@ -22,12 +32,22 @@ interface FilterProps {
   onChange : (value: FilterValue) => void;
 }
 
+/**
+ * Filter component for task status
+ * - Displays radio buttons for filtering tasks
+ * - Supports keyboard navigation
+ * - Provides visual and screen reader feedback
+ */
 export const Filter = ({ value, onChange }: FilterProps) => {
   const filters: FilterValue[] = ['all', 'todo', 'doing', 'done'];
   const buttonsRef           = useRef<(HTMLButtonElement | null)[]>([]);
   const isKeyboardNavigation = useRef(false);
   
-  // Focus management - only for keyboard navigation
+  /**
+   * Focus management for keyboard navigation
+   * - Only focuses buttons during keyboard navigation
+   * - Prevents focus on mouse interaction
+   */
   useEffect(() => {
     if (isKeyboardNavigation.current) {
       const selectedIndex = filters.indexOf(value);
@@ -36,7 +56,14 @@ export const Filter = ({ value, onChange }: FilterProps) => {
     }
   }, [value, filters]);
 
-  // Keyboard interaction handler
+  /**
+   * Keyboard interaction handler
+   * - Left/Up: Previous filter
+   * - Right/Down: Next filter
+   * - Home: First filter
+   * - End: Last filter
+   * - Enter/Space: Select filter
+   */
   const handleKeyDown = (e: React.KeyboardEvent, index: number) => {
     let nextIndex: number;
     isKeyboardNavigation.current = true;

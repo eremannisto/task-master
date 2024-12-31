@@ -1,12 +1,24 @@
 import { useRef, useState, useEffect } from 'react';
 import styles from './Masonry.module.css';
 
+/**
+ * Props for Masonry component
+ * - items: Array of items to display in the grid
+ * - gap: Space between items in rem units
+ * - render: Function to render each item
+ */
 interface MasonryProps<T> {
   items: T[];
   gap?: number;
   render: (item: T, index: number) => React.ReactNode;
 }
 
+/**
+ * Masonry layout component
+ * - Arranges items in a responsive grid
+ * - Supports keyboard navigation
+ * - Maintains focus and scroll position
+ */
 export function Masonry<T>({ 
   items, 
   gap = 0.8,
@@ -15,19 +27,29 @@ export function Masonry<T>({
   const containerRef = useRef<HTMLDivElement>(null);
   const [columnCount, setColumnCount] = useState(4);
 
-  // Helper function to focus and scroll with offset
+  /**
+   * Focuses an element and scrolls it into view with offset
+   * - Ensures focused element is visible
+   * - Accounts for fixed navigation height
+   */
   const focusWithScroll = (element: HTMLElement | undefined) => {
     if (!element) return;
     element.focus();
     scrollIntoViewWithOffset(element);
   };
 
+  /**
+   * Scrolls an element into view with navigation offset
+   * - Calculates offset based on navigation height
+   * - Adds extra padding for visual comfort
+   * - Only scrolls if element is above navigation
+   */
   const scrollIntoViewWithOffset = (element: HTMLElement) => {
-    const navOffsetRem = 16; // Navigation height in rem
-    const extraPaddingRem = 1; // Extra padding in rem
-    const navOffset = navOffsetRem * parseFloat(getComputedStyle(document.documentElement).fontSize);
-    const rect = element.getBoundingClientRect();
-    const isAboveNav = rect.top < navOffset;
+    const navOffsetRem    = 16; // Navigation height in rem units
+    const extraPaddingRem = 1;  // Extra padding in rem units
+    const navOffset       = navOffsetRem * parseFloat(getComputedStyle(document.documentElement).fontSize);
+    const rect            = element.getBoundingClientRect();
+    const isAboveNav      = rect.top < navOffset;
     
     if (isAboveNav) {
       const extraPadding = extraPaddingRem * parseFloat(getComputedStyle(document.documentElement).fontSize);
@@ -38,7 +60,11 @@ export function Masonry<T>({
     }
   };
 
-  // Handle focus events for tab navigation
+  /**
+   * Handles focus events for tab navigation
+   * - Scrolls focused items into view
+   * - Ensures items aren't hidden behind navigation
+   */
   useEffect(() => {
     const handleFocus = (e: FocusEvent) => {
       const target = e.target as HTMLElement;
@@ -46,15 +72,17 @@ export function Masonry<T>({
         scrollIntoViewWithOffset(target);
       }
     };
-
     containerRef.current?.addEventListener('focusin', handleFocus);
     return () => containerRef.current?.removeEventListener('focusin', handleFocus);
   }, []);
 
-  // Update column count based on container width
+  /**
+   * Updates column count based on container width
+   * - Responsive layout: 1-4 columns based on width
+   * - Uses ResizeObserver for dynamic updates
+   */
   useEffect(() => {
     if (!containerRef.current) return;
-
     const updateColumnCount = () => {
       const width = containerRef.current?.offsetWidth || 0;
       let cols = 4;
@@ -63,15 +91,18 @@ export function Masonry<T>({
       else if (width <= 1280) cols = 3;
       setColumnCount(cols);
     };
-
     const observer = new ResizeObserver(updateColumnCount);
     observer.observe(containerRef.current);
     updateColumnCount(); // Initial count
-
     return () => observer.disconnect();
   }, []);
 
-  // Handle arrow key navigation
+  /**
+   * Handles arrow key navigation between items
+   * - Left/Right: Move between columns
+   * - Up/Down: Move within column
+   * - Maintains focus position when moving between columns
+   */
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if (!['ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown'].includes(e.key)) return;
@@ -131,7 +162,11 @@ export function Masonry<T>({
   // Create columns with correct item distribution
   const columns = Array.from({ length: columnCount }, () => [] as T[]);
   
-  // Fill columns vertically for correct up/down navigation
+  /**
+   * Fill columns vertically for correct up/down navigation
+   * - Distributes items evenly across columns
+   * - Ensures consistent navigation order
+   */
   items.forEach((item, index) => {
     const columnIndex = index % columnCount;
     columns[columnIndex].push(item);

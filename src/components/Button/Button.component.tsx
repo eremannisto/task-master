@@ -2,30 +2,62 @@ import { forwardRef } from 'react';
 import { LucideIcon } from 'lucide-react';
 import styles         from './Button.module.css';
 
-export type ButtonSize    = 'small' | 'medium' | 'large';
-export type ButtonVariant = 'solid' | 'ghost'  | 'outline';
+/**
+ * Button size options
+ * - small: Compact size for tight spaces
+ * - medium: Standard size for most uses
+ * - large: Prominent size for important actions
+ */
+export type ButtonSize = 'small' | 'medium' | 'large';
 
+/**
+ * Button variant options
+ * - solid: Filled background
+ * - ghost: No background until hover
+ * - outline: Border with transparent background
+ */
+export type ButtonVariant = 'solid' | 'ghost' | 'outline';
+
+/**
+ * Button theme options
+ * - Color themes from Tailwind palette
+ * - Each theme has its own hover and active states
+ * - Includes both colorful and neutral options
+ */
 export type ButtonTheme = 'red'    | 'orange'  | 'amber'   | 'yellow' |
-                          'lime'   | 'green'   | 'emerald' | 'teal'   | 
-                          'cyan'   | 'sky'     | 'blue'    | 'indigo' | 
-                          'violet' | 'purple'  | 'fuchsia' | 'pink'   | 
-                          'rose'   | 'stone'   | 'neutral' | 'zinc'   | 
-                          'gray'   | 'slate';
+                         'lime'   | 'green'   | 'emerald' | 'teal'   | 
+                         'cyan'   | 'sky'     | 'blue'    | 'indigo' | 
+                         'violet' | 'purple'  | 'fuchsia' | 'pink'   | 
+                         'rose'   | 'stone'   | 'neutral' | 'zinc'   | 
+                         'gray'   | 'slate';
 
+/**
+ * Button component props
+ * - Extends standard button attributes
+ * - Supports icons, loading states, and themes
+ * - Includes accessibility attributes
+ */
 interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
-  title        : string;
-  description? : string;
-  icon?        : LucideIcon;
-  className?   : string;
-  size?        : ButtonSize;
-  variant?     : ButtonVariant;
-  theme?       : ButtonTheme;
-  isLoading?   : boolean;
-  isDisabled?  : boolean;
-  hideTitle?   : boolean;
-  hideIcon?    : boolean;
+  title        : string;     // Button text
+  description? : string;     // Additional description for screen readers
+  icon?        : LucideIcon; // Optional Lucide icon
+  className?   : string;     // Additional CSS classes
+  size?        : ButtonSize; // Button size variant
+  variant?     : ButtonVariant; // Button style variant
+  theme?       : ButtonTheme;   // Color theme
+  isLoading?   : boolean;    // Loading state
+  isDisabled?  : boolean;    // Disabled state
+  hideTitle?   : boolean;    // Hide text on mobile
+  hideIcon?    : boolean;    // Hide icon on mobile
 }
 
+/**
+ * Button component
+ * - Accessible button with multiple variants
+ * - Supports loading states and icons
+ * - Responsive with mobile considerations
+ * - Follows WAI-ARIA button patterns
+ */
 export const Button = forwardRef<HTMLButtonElement, ButtonProps>(({
   title,                    // Title of the button
   description,              // Description of the button

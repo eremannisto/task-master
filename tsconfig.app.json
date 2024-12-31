@@ -28,7 +28,7 @@
       "@/*"           : ["src/*"],
       "@assets/*"     : ["src/assets/*"],
       "@components/*" : ["src/components/*"],
-      "@data"         : ["src/data.ts"],
+      "@data"         : ["src/mock-data.ts"],
       "@styles/*"     : ["src/styles/*"],
       "@types"        : ["src/types.ts"],
       "@utils/*"     : ["src/utils/*"]

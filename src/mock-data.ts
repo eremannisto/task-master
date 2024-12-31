@@ -1,10 +1,5 @@
-import { ProjectComponent } from '@types';
-
-const generateId = () => {
-  return 'id-' + Math.random().toString(36).substring(2, 9) + '-' + 
-         Date.now().toString(36) + '-' + 
-         Math.random().toString(36).substring(2, 9);
-};
+import type { ProjectComponent } from '@components/Project/Project.types';
+import { generateId }            from '@utils/generateId';
 
 export const mockProjects: ProjectComponent[] = [
   {

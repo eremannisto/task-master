@@ -1,22 +1,11 @@
 import { useRef, useEffect }                    from 'react';
-import { type TaskStatus, FilterValue }         from '@types';
 import { CircleDashed, CircleDot, CircleCheck } from 'lucide-react';
+import type { TaskStatus }                      from '@/components/Project/Project.types';
+import type { FilterProps, FilterValue, FilterIcons } from './Filter.types';
 import styles                                   from './Filter.module.css';
 
 /**
- * Icon mapping for task statuses
- * - todo: Empty circle
- * - doing: Circle with dot
- * - done: Circle with check
- */
-const icons: Record<TaskStatus, React.ReactNode> = {
-  todo : <CircleDashed className={styles.icon} aria-hidden="true" />,
-  doing: <CircleDot    className={styles.icon} aria-hidden="true" />,
-  done : <CircleCheck  className={styles.icon} aria-hidden="true" />,
-};
-
-/**
- * Descriptive text for screen readers
+ * Filter descriptions for screen readers
  * - Provides clear context for each filter option
  * - Used in aria-label attributes
  */
@@ -27,10 +16,17 @@ const filterDescriptions: Record<FilterValue, string> = {
   done:  'Show only completed tasks'
 };
 
-interface FilterProps {
-  value    : FilterValue;
-  onChange : (value: FilterValue) => void;
-}
+/**
+ * Icon mapping for task statuses
+ * - todo: Empty circle
+ * - doing: Circle with dot
+ * - done: Circle with check
+ */
+const icons: FilterIcons = {
+  todo : <CircleDashed className={styles.icon} aria-hidden="true" />,
+  doing: <CircleDot    className={styles.icon} aria-hidden="true" />,
+  done : <CircleCheck  className={styles.icon} aria-hidden="true" />,
+};
 
 /**
  * Filter component for task status

@@ -1,15 +1,10 @@
 import { useCallback, useRef }        from 'react'
 import { CirclePlus, DatabaseBackup } from 'lucide-react'
-import { mockProjects }               from '@data'
-import { Button }                     from '@components/Button/Button.component.tsx'
-
-import styles from './Navigation.module.css'
-import logo   from '@assets/logo-alt.png'
-
-interface NavigationProps {
-  onNewProject: () => void;
-}
-
+import { mockProjects }               from '@/mock-data'
+import { Button }                     from '@components/Button/Button.component'
+import styles                         from './Navigation.module.css'
+import logo                           from '@assets/logo-alt.png'
+import type { NavigationProps }       from './Navigation.types'
 /**
  * Action button descriptions for screen readers
  * - mockData: Loads sample project data

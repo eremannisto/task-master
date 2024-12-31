@@ -1,16 +1,32 @@
 import { useEffect, useRef } from 'react';
-import { X } from 'lucide-react';
-import styles from './Modal.module.css';
+import { X }                 from 'lucide-react';
+import styles                from './Modal.module.css';
 
+/**
+ * Props for Modal component
+ * - title        : Header text of the modal
+ * - description  : Optional subtext below the header
+ * - children     : Content to display in the modal body
+ * - isOpen       : Controls modal visibility
+ * - onClose      : Callback when modal is closed
+ * - variant      : Visual style variant (default or form)
+ */
 interface ModalProps {
-  title: string;
-  description?: string;
-  children: React.ReactNode;
-  isOpen: boolean;
-  onClose: () => void;
-  variant?: 'default' | 'form';
+  title        : string;
+  description? : string;
+  children     : React.ReactNode;
+  isOpen       : boolean;
+  onClose      : () => void;
+  variant?     : 'default' | 'form';
 }
 
+/**
+ * Modal dialog component
+ * - Accessible modal implementation using HTML dialog
+ * - Manages focus trap and restoration
+ * - Supports keyboard navigation and escape to close
+ * - Provides ARIA labeling for screen readers
+ */
 export function Modal({ 
   title, 
   description, 
@@ -19,9 +35,21 @@ export function Modal({
   onClose,
   variant = 'default'
 }: ModalProps) {
-  const dialogRef = useRef<HTMLDialogElement>(null);
+
+  /**
+   * Ref for the modal dialog element
+   * - Used to open and close the modal
+   * - Manages focus restoration
+   */
+  const dialogRef             = useRef<HTMLDialogElement>(null);
   const previousActiveElement = useRef<HTMLElement | null>(null);
 
+  /**
+   * Modal lifecycle management
+   * - Opens/closes modal based on isOpen prop
+   * - Manages focus when modal opens/closes
+   * - Restores focus to previous element on close
+   */
   useEffect(() => {
     const dialog = dialogRef.current;
     if (!dialog) return;
@@ -43,6 +71,11 @@ export function Modal({
     }
   }, [isOpen]);
 
+  /**
+   * Keyboard event handler
+   * - Closes modal on Escape key press
+   * - Supplements native dialog Escape handling
+   */
   const handleKeyDown = (event: React.KeyboardEvent) => {
     if (event.key === 'Escape') {
       onClose();
@@ -51,13 +84,13 @@ export function Modal({
 
   return (
     <dialog 
-      ref={dialogRef}
-      className={styles.modal}
-      onKeyDown={handleKeyDown}
-      aria-labelledby="modal-title"
-      aria-describedby={description ? "modal-description" : undefined}
-      aria-modal="true"
-      role="dialog"
+      ref              = {dialogRef}
+      className        = {styles.modal}
+      onKeyDown        = {handleKeyDown}
+      aria-labelledby  = {"modal-title"}
+      aria-describedby = {description ? "modal-description" : undefined}
+      aria-modal       = "true"
+      role             = "dialog"
     >
       <header className={`${styles.header} ${styles[variant]}`}>
         <div>

@@ -1,5 +1,8 @@
-import type { ProjectComponent, TaskComponent, TaskStatus }  from '@types';
 import { useState, useEffect, useCallback, useMemo, useRef } from 'react';
+
+// Types
+import type { ProjectComponent, TaskComponent, TaskStatus }  from '@/components/Project/Project.types';
+import type { TaskManagerProps }                             from './TaskManager.types';
 
 // Components
 import { Masonry }              from '@/components/Masonry/Masonry.component';
@@ -16,30 +19,50 @@ import { PlusCircle } from 'lucide-react';
 // Styles
 import styles from './TaskManager.module.css';
 
-interface TaskManagerProps {
-  initialModalOpen?: boolean;
-  onModalClose?: () => void;
-}
-
-// Main TaskManager component
+/**
+ * Main TaskManager component
+ * - Manages projects and their tasks
+ * - Handles project filtering and persistence
+ * - Provides keyboard navigation
+ * - Implements loading states and empty states
+ */
 export default function TaskManager({ initialModalOpen = false, onModalClose }: TaskManagerProps) {
 
-  // State management
+  /**
+   * Component state
+   * - projects: List of all projects
+   * - isLoading: Loading state for initial data fetch
+   * - filter: Current task filter status
+   * - editingProject: Project being edited (if any)
+   * - isModalOpen: Controls create/edit modal visibility
+   */
   const [projects,       setProjects]       = useState<ProjectComponent[]>([]);
   const [isLoading,      setIsLoading]      = useState(true);
   const [filter,         setFilter]         = useState<'all' | TaskStatus>('all');  
   const [editingProject, setEditingProject] = useState<ProjectComponent | null>(null);
   const [isModalOpen,    setIsModalOpen]    = useState(initialModalOpen);
 
-  // Refs management
+  /**
+   * Refs for project elements
+   * - Used for keyboard navigation
+   * - Maps project IDs to their DOM elements
+   */
   const projectRefs = useRef<Map<string, HTMLElement>>(new Map());
 
-  // Sync modal state with parent
+  /**
+   * Modal state synchronization
+   * Updates modal visibility when parent prop changes
+   */
   useEffect(() => {
     setIsModalOpen(initialModalOpen);
   }, [initialModalOpen]);
 
-  // Load projects from localStorage on initial mount
+  /**
+   * Initial data loading
+   * - Loads projects from localStorage
+   * - Includes artificial loading delay for UX
+   * - Handles error cases
+   */
   useEffect(() => {
     const loadProjects = async () => {
       try {
@@ -64,14 +87,21 @@ export default function TaskManager({ initialModalOpen = false, onModalClose }: 
     loadProjects();
   }, []);
 
-  // Persist projects to localStorage whenever they change
+  /**
+   * Project persistence
+   * Saves projects to localStorage when they change
+   */
   useEffect(() => {
     if (!isLoading) {
       localStorage.setItem('projects', JSON.stringify(projects));
     }
   }, [projects, isLoading]);
 
-  // Filter projects based on task status
+  /**
+   * Project filtering
+   * - Filters projects based on task status
+   * - Memoized to prevent unnecessary recalculations
+   */
   const filteredProjects = useMemo(() => {
     if (filter === 'all') return projects;
     return projects.filter(project => 
@@ -79,6 +109,11 @@ export default function TaskManager({ initialModalOpen = false, onModalClose }: 
     );
   }, [projects, filter]);
 
+  /**
+   * Handles project deletion
+   * - Removes project from state and refs
+   * - Updates localStorage immediately
+   */
   const handleDelete = useCallback((projectId: string) => {
     projectRefs.current.delete(projectId);
     setProjects(prev => {
@@ -89,6 +124,11 @@ export default function TaskManager({ initialModalOpen = false, onModalClose }: 
     });
   }, []);
 
+  /**
+   * Handles task updates within a project
+   * - Updates tasks while maintaining project structure
+   * - Optimizes by checking if tasks actually changed
+   */
   const handleTaskUpdate = useCallback((projectId: string, newTasks: TaskComponent[]) => {
     setProjects(prev => {
       const project = prev.find(p => p.id === projectId);
@@ -103,6 +143,11 @@ export default function TaskManager({ initialModalOpen = false, onModalClose }: 
     });
   }, []);
 
+  /**
+   * Handles project creation
+   * - Creates new project with empty task list
+   * - Updates state and closes modal
+   */
   const handleCreateProject = (projectData: Omit<ProjectComponent, 'tasks'>) => {
     const newProject: ProjectComponent = {
       ...projectData,
@@ -114,6 +159,11 @@ export default function TaskManager({ initialModalOpen = false, onModalClose }: 
     onModalClose?.();
   };
 
+  /**
+   * Handles project editing
+   * - Updates project details while preserving tasks
+   * - Cleans up editing state and closes modal
+   */
   const handleEditProject = (projectData: Omit<ProjectComponent, 'id' | 'tasks'>) => {
     if (!editingProject) return;
     
@@ -132,7 +182,11 @@ export default function TaskManager({ initialModalOpen = false, onModalClose }: 
     onModalClose?.();
   };
 
-  // Handle keyboard navigation within the projects grid
+  /**
+   * Keyboard navigation handler
+   * - Ctrl+Home: Focus first project
+   * - Ctrl+End: Focus last project
+   */
   const handleProjectKeyDown = useCallback((e: React.KeyboardEvent) => {
     switch (e.key) {
       case 'Home':
@@ -150,7 +204,12 @@ export default function TaskManager({ initialModalOpen = false, onModalClose }: 
     }
   }, [filteredProjects]);
 
-  // Render individual project
+  /**
+   * Project rendering function
+   * - Memoized to prevent unnecessary re-renders
+   * - Sets up refs for keyboard navigation
+   * - Handles project events
+   */
   const renderProject = useCallback((project: ProjectComponent) => (
     <Project
       ref={el => el && projectRefs.current.set(project.id, el)}
